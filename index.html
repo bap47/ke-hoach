@@ -1277,7 +1277,7 @@ function planView(L,tin,tout,tsv){var mo=finMonth(),I=(S.settings.incomes=S.sett
  function rcv(x){return L.filter(function(t){return t.kind==='in'&&t.inc===x.id}).reduce(function(s,t){return s+(+t.amount||0)},0)}
  function pday(x){return x.day?Math.min(+x.day,dim):0}
  var gotFix=0,pend=0,pendL=[];
- I.forEach(function(x){if(x.var)return;var r=rcv(x);if(r){gotFix+=r;return}if(+x.amount){pend+=+x.amount;if(pday(x))pendL.push(pday(x))}});
+ I.forEach(function(x){if(x.var){var rv=rcv(x),left=(+x.amount||0)-rv;if(left>0)pend+=left;return}var r=rcv(x);if(r){gotFix+=r;return}if(+x.amount){pend+=+x.amount;if(pday(x))pendL.push(pday(x))}});
  function st(x){var r=rcv(x),dy=pday(x);if(r)return'<span class="ist ok">✓ Đã nhận'+(x.var&&r?' '+money(r,1):'')+'</span>';
   if(x.var)return'<button class="pill sm" data-incrcv="'+x.id+'">+ Ghi tiền về</button>';
   if(!dy)return'<span class="ist mu">Chưa có ngày</span>';
@@ -1287,11 +1287,12 @@ function planView(L,tin,tout,tsv){var mo=finMonth(),I=(S.settings.incomes=S.sett
  h+='<div class="ptr ph"><span>Nguồn thu</span><span></span><span class="r">Ngày nhận</span><span class="r">Số tiền</span><span>Trạng thái</span><span></span></div>';
  h+=I.map(function(x){return'<div class="ptr'+(x.var?' pvar':'')+'"><input class="inp" data-incname="'+x.id+'" value="'+esc(x.name||'')+'" placeholder="vd: Lương SNDQ"><span class="ichips"><button class="chip ivar'+(x.var?' on2':'')+'" data-incvar="'+x.id+'" title="Bấm để đổi">'+(x.var?'Không cố định':'Cố định')+'</button><button class="chip ivar'+(x.month?' on2':'')+'" data-incmo="'+x.id+'" title="Bấm để đổi">'+(x.month?'Chỉ '+monthText(x.month).replace('Tháng ','T'):'Hằng tháng')+'</button></span><span class="iday">'+(x.var?'<span class="mu">—</span>':'<input class="inp r nospin" type="number" min="1" max="31" data-incday="'+x.id+'" value="'+(x.day||'')+'" placeholder="ngày">')+'</span><input class="inp r" data-incamt="'+x.id+'" inputmode="decimal" value="'+(x.amount?(+x.amount).toLocaleString('vi-VN'):'')+'" placeholder="'+(x.var?'ước tính (tuỳ)':'0')+'"><span class="ists">'+st(x)+'</span><button class="ib" data-incdel="'+x.id+'" title="Xoá">'+IC.close+'</button></div>'}).join('');
  h+='<div class="ptr padd"><button class="pill" data-a="incadd">'+IC.plus+'Thêm nguồn thu</button></div>';
- h+='<div class="ptr pt sumr"><span>Thu cố định dự kiến</span><b class="r fin in">'+money(fix)+'</b></div>';
+ if(hasVar){h+='<div class="ptr pt2 sumr"><span>Thu cố định</span><span class="r">'+money(fix)+'</span></div>';h+='<div class="ptr pt2 sumr"><span>Không cố định (ước tính)</span><span class="r">'+money(est)+'</span></div>'}
+ h+='<div class="ptr pt sumr"><span>Tổng thu dự kiến</span><b class="r fin in">'+money(fix+est)+'</b></div>';
  h+='<div class="ptr pt sumr hl"><span><b>Tiền thực có tới hôm nay</b><small>các khoản Thu đã ghi trong tháng</small></span><b class="r fin in big">'+money(tin)+'</b></div>';
  if(tout||tsv)h+='<div class="ptr pt2 sumr"><span>Còn trong tay (sau khi trừ chi '+money(tout,1)+' & tiết kiệm '+money(tsv,1)+')</span><b class="r'+(tin-tout-tsv<0?' over':'')+'">'+money(tin-tout-tsv)+'</b></div>';
  if(pend)h+='<div class="ptr pt2 sumr"><span>Sắp nhận'+(pendL.length?' (ngày '+pendL.sort(function(a,b){return a-b}).map(pad).join(', ')+')':'')+'</span><span class="r">'+money(pend)+'</span></div>';
- if(hasVar)h+='<div class="ptr pt2 sumr"><span>Trong đó không cố định đã về</span><span class="r">'+money(vrec)+(est?' <em>/ ước ~'+money(est,1)+'</em>':'')+'</span></div>';
+ if(hasVar&&vrec)h+='<div class="ptr pt2 sumr"><span>Trong đó không cố định đã về</span><span class="r">'+money(vrec)+(est?' <em>/ ước ~'+money(est,1)+'</em>':'')+'</span></div>';
  h+='</div>'+(hasVar?'<div class="note" style="margin-top:8px">Thu không cố định (freelance…) chỉ được đem ra chia khi bạn ghi khoản <b>Thu</b> thật, nên tháng ít job thì kế hoạch cũng tự co lại, không bị chia lố.</div>':'')+'</div>';
  var ed=UI.pedit,rows=[['__save',S.settings.saveName||'Tiết kiệm (cho mục tiêu)','#5E6AD2',tsv]].concat(FCATS.filter(outCat).map(function(c){return[c[0],c[1],c[2],L.filter(function(t){return t.kind==='out'&&!fromFund(t)&&t.fcat===c[0]}).reduce(function(s,t){return s+(+t.amount||0)},0)]}));
  var tot=rows.reduce(function(s,r){return s+(+B[r[0]]||0)},0),left=base-tot;
