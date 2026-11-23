@@ -537,6 +537,7 @@ button.pv:hover{background:var(--hover)}
 .dpsel{display:inline-flex;align-items:center;gap:2px;margin-left:auto;background:var(--chip);border-radius:8px;padding:2px 6px;font-variant-numeric:tabular-nums}
 .dpsel select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font:inherit;font-size:14px;font-weight:600;color:var(--ink);padding:4px 2px;cursor:pointer;text-align:center}
 .dpsel select:focus{outline:none;background:var(--panel);border-radius:5px}
+.calbtns{display:flex;flex-wrap:wrap;gap:6px}.calbtns a.pill{text-decoration:none;color:inherit}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -667,9 +668,18 @@ var STORE=(function(){var sb=null,user=null,timer=null,base=0,saving=false,dirty
    sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
    sb.auth.getSession().then(function(r){if(r.data&&r.data.session)onSession(r.data.session);else loginView('login')});
    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&user&&!dirty)load()})},
-  settingsHTML:function(){return'<div class="box"><p>Tài khoản</p><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span>Đang đăng nhập: <b>'+esc(uname())+'</b></span><span class="sp"></span><label class="pill">Nhập dữ liệu<input type="file" accept=".json,application/json" id="impfile" hidden></label><button class="pill" data-a="export">Xuất dữ liệu (JSON)</button><button class="pill danger" data-a="logout">Đăng xuất</button></div></div>'},
+  settingsHTML:function(){return'<div class="box"><p>Tài khoản</p><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span>Đang đăng nhập: <b>'+esc(uname())+'</b></span><span class="sp"></span><label class="pill">Nhập dữ liệu<input type="file" accept=".json,application/json" id="impfile" hidden></label><button class="pill" data-a="export">Xuất dữ liệu (JSON)</button><button class="pill danger" data-a="logout">Đăng xuất</button></div></div>'+calBox()},
   action:function(a){if(a==='logout'){sb.auth.signOut().then(function(){try{localStorage.removeItem('bap-kanban');sessionStorage.removeItem('bap-ui')}catch(x){}location.reload()});return true}
    if(a==='export'){var dl=document.createElement('a');dl.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));dl.download='ke-hoach-'+uname()+'.json';document.body.appendChild(dl);dl.click();dl.remove();toast('Đã tải file dữ liệu');return true}return false}}})();
+
+function calUrl(){return SB_URL+'/functions/v1/cal?t='+S.settings.calToken}
+function calBox(){var tk=S.settings.calToken;if(!tk)return'<div class="box"><p>Lịch tự động</p><div class="note" style="margin:0 0 8px">Mọi việc có deadline và lịch học tự hiện trong Lịch Apple / Google Calendar, tự cập nhật khi bạn sửa.</div><button class="pill" data-a="calon">'+IC.cal+'Bật lịch tự động</button></div>';
+ var u=calUrl(),w=u.replace(/^https:/,'webcal:');
+ return'<div class="box"><p>Lịch tự động · đang bật</p><div class="calbtns"><a class="pill" href="'+esc(w)+'">'+IC.cal+'Thêm vào Lịch Apple</a><a class="pill" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/r?cid='+encodeURIComponent(w)+'">'+IC.cal+'Thêm vào Google Calendar</a><button class="pill" data-a="calcopy">Copy link</button><button class="pill danger" data-a="calreset" title="Link cũ sẽ ngừng hoạt động">Đổi link</button></div><div class="note" style="margin-top:8px">Chỉ cần thêm 1 lần. iPhone: mở link này trên iPhone → Đăng ký. Lịch Apple cập nhật mỗi 15 phút, Google chậm hơn (vài giờ). Không chia sẻ link này cho người khác.</div></div>'}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-a=calon],[data-a=calcopy],[data-a=calreset]');if(!b)return;e.stopPropagation();e.preventDefault();var a=b.dataset.a;
+ function gen(){var r=new Uint8Array(18);crypto.getRandomValues(r);return Array.from(r,function(x){return('0'+x.toString(16)).slice(-2)}).join('')}
+ if(a==='calon'||a==='calreset'){if(a==='calreset'&&!b.dataset.sure){b.dataset.sure=1;b.textContent='Bấm lần nữa để đổi';return}S.settings.calToken=gen();changed();settings();toast('Đã bật lịch tự động');return}
+ if(a==='calcopy'){navigator.clipboard&&navigator.clipboard.writeText(calUrl());toast('Đã copy link lịch')}},true);
 
 
 /* ---------- views ---------- */
