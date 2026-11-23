@@ -1248,7 +1248,7 @@ function finAdd(){var a=parseMoney(($('#fq-amt')||{}).value);if(!a){toast('Nhậ
  var k=UI.fk||'out',sel=$('#fq-cat').value,note=$('#fq-note').value.trim(),cid=vcat()||finCat(),mo=finMonth(),today=ymd(new Date());
  var r={id:uid(),created:Date.now(),cat:cid,kind:k,amount:a,name:note,date:mo===today.slice(0,7)?today:mo+'-01',checks:[],links:[]};
  if(k==='save'){r.fcat='khac';if(sel)r.goal=sel.slice(2)}else r.fcat=sel||'khac';
- recs('finance').push(r);changed();renderMain();var f=$('#fq-amt');if(f)f.focus();toast((k==='in'?'Đã ghi thu ':k==='save'?'Đã bỏ quỹ ':'Đã ghi chi ')+money(a))}
+ recs('finance').push(r);changed();renderMain();var f=$('#fq-amt');if(f)f.focus();var gg=goalOf(r)&&rec('goals',goalOf(r));toast((k==='in'?'Đã ghi thu ':k==='save'?'Đã bỏ quỹ ':'Đã ghi chi ')+money(a)+(gg&&k==='out'?' · ⭐ tính vào “'+(gg.name||'mục tiêu')+'”':''))}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-va],[data-fm],[data-fk],[data-a=fadd],[data-a=fbud],[data-a=goalref],[data-a=goalsave],[data-a=goalimgdel],[data-goalunref]');if(!b)return;var d=b.dataset;e.stopPropagation();
  if(d.va!=null){UI.va=d.va;saveUI();renderMain();return}
  if(d.fm!=null){if(d.fm==='0')UI.fm=null;else{var p=finMonth().split('-'),dt=new Date(+p[0],+p[1]-1+(+d.fm),1);UI.fm=dt.getFullYear()+'-'+pad(dt.getMonth()+1)}saveUI();renderMain();return}
