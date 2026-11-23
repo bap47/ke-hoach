@@ -1189,7 +1189,7 @@ function ftype(k){for(var i=0;i<FCATS.length;i++)if(FCATS[i][0]===k)return FCATS
 function outCat(c){return(c[3]||'out')!=='in'}function inCat(c){return(c[3]||'out')!=='out'}
 MODS.goals={name:'Mục tiêu',one:'mục tiêu',ic:'star',group:'area',layouts:['list'],fields:[
  {k:'name',t:'title',ph:'Mục tiêu của bạn (vd: Mua MacBook mới)'},{k:'area',l:'Nhóm',t:'sel',o:AREAS},{k:'year',l:'Mốc thời gian',t:'mpick'},
- {k:'target',l:'Số tiền cần',t:'money'},{k:'fcats',l:'Tự gom chi theo danh mục',t:'fcmulti'},{k:'kw',l:'Từ khoá tự nhận chi',t:'str'},{k:'prog',l:'Tiến độ tự nhập (%)',t:'num',ph:'0–100'},
+ {k:'target',l:'Số tiền cần',t:'money'},{k:'fcats',l:'Hạng mục chi / phân chia',t:'fcmulti'},{k:'kw',l:'Từ khoá tự nhận chi',t:'str'},{k:'prog',l:'Tiến độ tự nhập (%)',t:'num',ph:'0–100'},
  {k:'note',l:'Vì sao mục tiêu này quan trọng',t:'text',ph:'Viết ra lý do, cảm giác khi đạt được…'},{k:'links',l:'Link cảm hứng',t:'links'}],chips:['area','year']};
 MODS.finance={name:'Tài chính',one:'giao dịch',ic:'wallet',layouts:['list'],fields:[
  {k:'name',t:'title',ph:'Nội dung (vd: Cà phê với khách)'},{k:'cat',l:'Mảng',t:'cat'},
@@ -1369,7 +1369,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-cats
 function fcMulti(r){syncFcats();var sel=(r.fcats||[]).slice();if(r.fcat&&sel.indexOf(r.fcat)<0)sel.push(r.fcat);
  return'<div class="fcm">'+FCATS.filter(outCat).map(function(c){var on=sel.indexOf(c[0])>=0;return'<button class="chip'+(on?' on2':'')+'" data-fcm="'+c[0]+'"><i style="background:'+c[2]+'"></i>'+esc(c[1])+'</button>'}).join('')+'</div>'}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-fcm]');if(!b)return;e.stopPropagation();var c=curRec();if(!c)return;var r=c.r,k=b.dataset.fcm;
- var sel=(r.fcats||[]).slice();if(r.fcat&&sel.indexOf(r.fcat)<0)sel.push(r.fcat);r.fcat='';var i=sel.indexOf(k);if(i<0)sel.push(k);else sel.splice(i,1);r.fcats=sel;changed();renderRecPanel();renderMain()},true);
+ var sel=(r.fcats||[]).slice();if(r.fcat&&sel.indexOf(r.fcat)<0)sel.push(r.fcat);r.fcat='';var i=sel.indexOf(k);if(i<0)sel.push(k);else sel.splice(i,1);r.fcats=sel;var M=cgMap();if(i<0){if(!M[k]||!rec('goals',M[k]))M[k]=r.id}else if(M[k]===r.id)delete M[k];changed();renderRecPanel();renderMain()},true);
 
 function cgMap(){return S.settings.catGoal=S.settings.catGoal||{}}
 function catName(k){if(k==='__save')return S.settings.saveName||'Tiết kiệm (cho mục tiêu)';var c=FCATS.filter(function(x){return x[0]===k})[0];return c?c[1]:''}
@@ -1381,6 +1381,7 @@ function autoLink(){syncFcats();var M=cgMap(),G=recs('goals'),ch=0;
  var keys=['__save'].concat(FCATS.filter(outCat).map(function(c){return c[0]}).filter(function(k){return k!=='khac'}));
  keys.forEach(function(k){if(M[k]&&!rec('goals',M[k])){delete M[k];ch=1}if(M[k])return;var n=nmKey(catName(k)),cw=nmWords(catName(k));if(n.length<3||!cw.length)return;
   var g=G.filter(function(g){var gn=nmKey(g.name);var gw=nmWords(g.name);return!catOfGoal(g)&&(gn===n||cw.every(function(w){return gw.indexOf(w)>=0}))})[0];if(g){M[k]=g.id;ch=1}});
+ G.forEach(function(g){(g.fcats||[]).forEach(function(k){if(!M[k]||!rec('goals',M[k])){M[k]=g.id;ch=1}})});
  for(var k in M){var g=rec('goals',M[k]);if(g&&k!=='__save'){g.fcats=g.fcats||[];if(g.fcats.indexOf(k)<0){g.fcats.push(k);ch=1}}}
  if(ch)changed()}
 function newGoalFor(k){var g={id:uid(),created:Date.now(),name:catName(k),area:k==='__save'?'money':'life',refs:[],links:[],checks:[],fcats:k==='__save'?[]:[k]};recs('goals').push(g);cgMap()[k]=g.id;return g}
