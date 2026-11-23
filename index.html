@@ -1334,8 +1334,10 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-incu
  if(d.incvar){S.settings.incomes.forEach(function(x){if(x.id===d.incvar)x.var=!x.var});changed();renderMain();return}
  if(d.incdel){S.settings.incomes=S.settings.incomes.filter(function(x){return x.id!==d.incdel});changed();renderMain();return}
  if(d.a==='planhint'){var inc=planBase();
-  if(!d.sure&&Object.keysbudOf(finMonth()).length){d.sure=1;b.textContent='Ghi đè số hiện tại?';return}
-  var BB=budOf(finMonth());Object.keys(BB).forEach(function(q){delete BB[q]});for(var k in PLAN_HINT)BB[k]=Math.round(inc*PLAN_HINT[k]/100/1e4)*1e4;changed();renderMain();toast('Đã điền gợi ý — chỉnh lại cho hợp với bạn nhé');return}
+  if(!d.sure&&Object.keys(budOf(finMonth())).length){d.sure=1;b.textContent='Ghi đè số hiện tại?';return}
+  var BB=budOf(finMonth());Object.keys(BB).forEach(function(q){delete BB[q]});var ks=['__save'].concat(FCATS.filter(outCat).map(function(c){return c[0]})),pc={},known=0,unk=[];ks.forEach(function(k){if(PLAN_HINT[k]!=null){pc[k]=PLAN_HINT[k];known+=PLAN_HINT[k]}else unk.push(k)});
+  if(!pc.__save){pc.__save=20;known+=20;unk=unk.filter(function(k){return k!=='__save'})}var left=Math.max(0,100-known);if(unk.length){var each=left>0?left/unk.length:10;unk.forEach(function(k){pc[k]=each})}
+  var tot=0;for(var q in pc)tot+=pc[q];for(var k in pc)BB[k]=Math.round(inc*pc[k]/tot/1e4)*1e4;changed();renderMain();toast('Đã điền gợi ý — chỉnh lại cho hợp với bạn nhé');return}
 },true);
 document.addEventListener('change',function(e){var t=e.target,d=t.dataset;if(!d)return;var I=S.settings.incomes||[];
  function inc(){return planBase()}
