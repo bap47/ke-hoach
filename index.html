@@ -1347,7 +1347,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-incu
  if(d.a==='incadd'){var id=uid();S.settings.incomes.push({id:id,name:'',amount:''});changed();renderMain();var x=$('[data-incname="'+id+'"]');x&&x.focus();return}
  if(d.fcsw){swatchPop(b,function(c){(S.settings.fcats||[]).forEach(function(x){if(x[0]===d.fcsw)x[2]=c});syncFcats();changed();renderMain()});return}
  if(d.a==='pedit'){UI.pedit=!UI.pedit;renderMain();return}
- if(d.a==='fcadd'){syncFcats();var k='c'+uid().slice(-6),cols=['#F2994A','#26B5CE','#E255A1','#4CB782','#A35BD6','#F2BE00','#EB5757','#5E6AD2'];var nc=[k,'Hạng mục mới',cols[S.settings.fcats.length%cols.length],'out'];var i=S.settings.fcats.map(function(c){return c[0]}).indexOf('luong');S.settings.fcats.splice(i<0?S.settings.fcats.length:i,0,nc);syncFcats();newGoalFor(k);changed();renderMain();var x=$('[data-fcname="'+k+'"]');if(x){x.focus();x.select()}return}
+ if(d.a==='fcadd'){syncFcats();var k='c'+uid().slice(-6),cols=['#F2994A','#26B5CE','#E255A1','#4CB782','#A35BD6','#F2BE00','#EB5757','#5E6AD2'];var nc=[k,'Hạng mục mới',cols[S.settings.fcats.length%cols.length],'out'];var i=S.settings.fcats.map(function(c){return c[0]}).indexOf('luong');S.settings.fcats.splice(i<0?S.settings.fcats.length:i,0,nc);syncFcats();changed();renderMain();var x=$('[data-fcname="'+k+'"]');if(x){x.focus();x.select()}return}
  if(d.fcdel){var n=recs('finance').filter(function(t){return t.fcat===d.fcdel}).length;if(n&&!d.sure){d.sure=1;b.style.color='var(--danger)';toast(n+' giao dịch đang dùng mục này sẽ chuyển sang “Khác”. Bấm lần nữa để xoá');return}
   recs('finance').forEach(function(t){if(t.fcat===d.fcdel)t.fcat='khac'});S.settings.fcats=S.settings.fcats.filter(function(c){return c[0]!==d.fcdel});Object.keys(S.settings.budgetM||{}).forEach(function(m){delete S.settings.budgetM[m][d.fcdel]});delete cgMap()[d.fcdel];syncFcats();changed();renderMain();return}
  if(d.incun){var mo2=finMonth();S.recs.finance=recs('finance').filter(function(t){return!(t.kind==='in'&&t.inc===d.incun&&fdate(t).slice(0,7)===mo2)});changed();renderMain();return}
@@ -1400,8 +1400,7 @@ function nmWords(s){return deacc((s||'').toLowerCase()).split(/[^a-z0-9]+/).filt
 function nmKey(s){return deacc((s||'').toLowerCase()).replace(/[^a-z0-9]/g,'')}
 function autoLink(){syncFcats();var M=cgMap(),G=recs('goals'),ch=0;
  var keys=['__save'].concat(FCATS.filter(outCat).map(function(c){return c[0]}).filter(function(k){return k!=='khac'}));
- keys.forEach(function(k){if(M[k]&&!rec('goals',M[k])){delete M[k];ch=1}if(M[k])return;var n=nmKey(catName(k)),cw=nmWords(catName(k));if(n.length<3||!cw.length)return;
-  var g=G.filter(function(g){var gn=nmKey(g.name);var gw=nmWords(g.name);return!catOfGoal(g)&&(gn===n||cw.every(function(w){return gw.indexOf(w)>=0}))})[0];if(g){M[k]=g.id;ch=1}});
+ keys.forEach(function(k){if(M[k]&&!rec('goals',M[k])){delete M[k];ch=1}});
  G.forEach(function(g){(g.fcats||[]).forEach(function(k){if(!M[k]||!rec('goals',M[k])){M[k]=g.id;ch=1}})});
  for(var k in M){var g=rec('goals',M[k]);if(g&&k!=='__save'){g.fcats=g.fcats||[];if(g.fcats.indexOf(k)<0){g.fcats.push(k);ch=1}}}
  if(ch)changed()}
@@ -1409,7 +1408,7 @@ function newGoalFor(k){var g={id:uid(),created:Date.now(),name:catName(k),area:k
 function goalBudgetLine(g){var k=catOfGoal(g);if(!k)return'';var b=+budOf(finMonth())[k]||0;return b?money(b,1)+'/tháng':''}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-fcgoal]');if(!b)return;e.stopPropagation();var k=b.dataset.fcgoal,M=cgMap();
  if(M[k]&&rec('goals',M[k])){if(!b.dataset.sure){b.dataset.sure=1;toast('Bấm lần nữa để bỏ liên kết với Vision board (mục tiêu vẫn giữ)');return}delete M[k];changed();renderMain();return}
- var used={};for(var q in M)used[M[q]]=1;var items=recs('goals').filter(function(g){return!used[g.id]}).map(function(g){return[g.id,g.name||'Mục tiêu',IC.star]}).concat([['__new','+ Tạo mục tiêu mới “'+catName(k)+'”','']]);
+ var used={};for(var q in M)used[M[q]]=1;var items=recs('goals').filter(function(g){return!used[g.id]}).map(function(g){return[g.id,g.name||'Mục tiêu',IC.star]});if(!items.length){toast('Chưa có mục tiêu nào trống — tạo mục tiêu trên Vision board trước nhé');return}
  pop(b,items,'',function(v){if(v==='__new'){var g=newGoalFor(k);toast('Đã thêm “'+g.name+'” vào Vision board')}else{M[k]=v;var g2=rec('goals',v);if(g2&&k!=='__save'){g2.fcats=g2.fcats||[];if(g2.fcats.indexOf(k)<0)g2.fcats.push(k)}toast('Đã nối với “'+(g2&&g2.name)+'”')}changed();renderMain()})},true);
 document.addEventListener('change',function(e){var t=e.target;if(!t.dataset||t.dataset.rf!=='name')return;var c=curRec();if(!c||c.m!=='goals')return;
  setTimeout(function(){var k=catOfGoal(c.r),nm=(c.r.name||'').trim();if(!k||!nm)return;if(k==='__save')S.settings.saveName=nm;else(S.settings.fcats||[]).forEach(function(x){if(x[0]===k)x[1]=nm});syncFcats();changed()},0)},true);
