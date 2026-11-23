@@ -428,14 +428,19 @@ button.pv:hover{background:var(--hover)}
 /* vision */
 .vis{padding:18px 20px 60px}.vhead h2{margin:2px 0 4px;font-size:24px;font-weight:650;letter-spacing:-.02em}.vhead p{margin:0 0 12px;color:var(--mute)}
 .vf{padding:0 0 14px}.vf .chip .c{margin-left:4px;opacity:.55;font-size:11px}
-.vgrid{columns:4 230px;column-gap:14px}
-.vcard,.vadd{break-inside:avoid;margin:0 0 14px;display:block;width:100%;border-radius:14px;overflow:hidden;background:var(--panel);border:1px solid var(--line2);cursor:pointer;transition:transform .15s,box-shadow .15s;text-align:left}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;align-items:stretch}
+.vcard,.vadd{display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:var(--panel);border:1px solid var(--line2);cursor:pointer;transition:transform .15s,box-shadow .15s;text-align:left;min-height:100%}
 .vcard:hover{transform:translateY(-2px);box-shadow:var(--sh)}
-.vcard img{display:block;width:100%;max-height:420px;object-fit:cover}
-.vph{aspect-ratio:4/3;display:grid;place-items:center;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 30%,transparent),color-mix(in srgb,var(--c) 8%,transparent))}.vph span{font-size:44px;font-weight:700;color:var(--c);opacity:.8}
-.vb{padding:10px 12px 12px}.vt{font-weight:600;font-size:15px;line-height:1.3}.vm{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0}.vp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mute)}.vp .bar{flex:1}
+.vimg{aspect-ratio:16/10;overflow:hidden;flex:none}.vimg img{width:100%;height:100%;object-fit:cover;display:block}
+.vph{display:grid;place-items:center;background:linear-gradient(140deg,color-mix(in srgb,var(--c) 22%,var(--panel)),color-mix(in srgb,var(--c) 6%,var(--panel)))}.vph span{font-size:38px;filter:saturate(.9)}
+.vb{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.vtop{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--mute);font-weight:500}.vdot{width:6px;height:6px;border-radius:50%;background:var(--c)}.vsep{opacity:.5}
+.vt{font-weight:620;font-size:15px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}
+.vmoney{font-size:13px;color:var(--mute);margin-top:auto}.vmoney b{font-size:17px;color:var(--ink);font-weight:650;letter-spacing:-.01em}.vmoney.muted{font-size:12.5px}
+.vp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}.vp .bar{flex:1}
+.vfoot{display:flex;gap:10px;font-size:11.5px;color:var(--faint)}
 .vdone .vt::after{content:' ✓';color:#4CB782}
-.vadd{border-style:dashed;background:none;color:var(--mute);padding:28px;display:flex;align-items:center;justify-content:center;gap:6px;font:inherit}.vadd:hover{color:var(--ink);border-color:var(--faint)}
+.vadd{border-style:dashed;background:none;color:var(--mute);align-items:center;justify-content:center;gap:8px;font:inherit;min-height:220px}.vadd:hover{color:var(--ink);border-color:var(--faint)}.vplus{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--chip)}
 .gimg{width:100%;border-radius:10px;margin-bottom:8px;max-height:320px;object-fit:cover}
 /* finance */
 .fin-w{padding:14px 20px 60px;max-width:980px}
@@ -448,7 +453,7 @@ button.pv:hover{background:var(--hover)}
 .fbar .fl{display:flex;align-items:center;gap:7px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.fbar .fl i{width:8px;height:8px;border-radius:50%;flex:none}
 .fbar .fv{text-align:right;color:var(--mute);font-variant-numeric:tabular-nums}.fbar .fv.over{color:var(--danger);font-weight:600}
 .fbar:has(.fbi){grid-template-columns:140px 1fr 120px 130px}.fbi{height:30px}
-@media(max-width:860px){.vis,.fin-w{padding:12px 12px 90px}.vgrid{columns:2 150px;column-gap:10px}.vcard,.vadd{margin-bottom:10px}.fbar{grid-template-columns:100px 1fr 90px}.fbar:has(.fbi){grid-template-columns:100px 1fr 100px}.fbar:has(.fbi) .fv{display:none}.fq .inp,.fq #fq-amt,.fq select.inp{max-width:none;min-width:45%}}
+@media(max-width:860px){.vis,.fin-w{padding:12px 12px 90px}.vgrid{grid-template-columns:1fr 1fr;gap:10px}.vb{padding:10px 11px 12px}.vt{font-size:14px}.vmoney b{font-size:15px}.vfoot{flex-direction:column;gap:2px}.fbar{grid-template-columns:100px 1fr 90px}.fbar:has(.fbi){grid-template-columns:100px 1fr 100px}.fbar:has(.fbi) .fv{display:none}.fq .inp,.fq #fq-amt,.fq select.inp{max-width:none;min-width:45%}}
 [data-pdrag]{cursor:grab}[data-pdrag]:hover .grip{opacity:1}
 .dpop{padding:12px;min-width:260px}.dpop .pnh{font-size:12px;color:var(--mute);margin:0 2px 8px}.dpop .dchips{margin-bottom:10px}.dpop .dchips button{padding:7px 10px}.dpop .dchips button.on{background:var(--accent);color:#fff}.dpop .primary{width:100%;justify-content:center}
 .rdue{width:132px;flex:none;display:flex}.rdue .tag{max-width:100%}
@@ -504,6 +509,9 @@ button.pv:hover{background:var(--hover)}
 @media(hover:none){.ptr .gl.off{opacity:.6}}
 .frow{display:flex;justify-content:space-between;padding:7px 2px;border-bottom:1px solid var(--line);font-size:13.5px}.frow[data-orec]{cursor:pointer}.frow span{color:var(--mute)}.frow.tot span{color:var(--text);font-weight:600}
 .fq .fql{font-weight:600;font-size:13.5px;padding:0 4px 0 2px;white-space:nowrap}
+.prow3{position:relative}.pgrip{position:absolute;left:-2px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:11px;letter-spacing:-2px;cursor:grab;opacity:0;padding:4px 2px}.prow3:hover .pgrip{opacity:1}
+.prow3.dz-a{box-shadow:inset 0 2px 0 var(--accent)}.prow3.dz-b{box-shadow:inset 0 -2px 0 var(--accent)}.dragging{opacity:.45}
+.vcard.dz-a{box-shadow:-3px 0 0 var(--accent)}.vcard.dz-b{box-shadow:3px 0 0 var(--accent)}.vcard[draggable]{cursor:grab}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -1227,10 +1235,14 @@ function visionView(){fundMig();flowSync(ymd(new Date()).slice(0,7));var G=recs(
  var done=G.filter(function(g){return goalProg(g)>=100}).length;
  h+='<div class="vis"><div class="vhead"><div><h2>'+new Date().getFullYear()+' — năm của Bắp ✨</h2><p>'+(G.length?G.length+' mục tiêu · '+done+' đã đạt':'Dán ảnh, đặt mục tiêu, gắn với dự án và quỹ tiết kiệm để thấy mình đang tiến tới đâu.')+'</p></div></div>';
  if(G.length)h+='<div class="calf vf"><button class="chip'+(!f?' on2':'')+'" data-va="">Tất cả<span class="c">'+G.length+'</span></button>'+AREAS.map(function(a){var n=G.filter(function(g){return g.area===a[0]}).length;return n?'<button class="chip'+(f===a[0]?' on2':'')+'" data-va="'+a[0]+'"><i style="background:'+a[2]+'"></i>'+a[1]+'<span class="c">'+n+'</span></button>':''}).join('')+'</div>';
- h+='<div class="vgrid">'+L.map(function(g){var a=opt(fld('goals','area'),g.area),p=goalProg(g);
-  return'<div class="vcard'+(p>=100?' vdone':'')+'" data-orec="goals:'+g.id+'">'+(g.img?'<img src="'+esc(g.img)+'" alt="" loading="lazy">':'<div class="vph" style="--c:'+a[2]+'"><span>'+esc((g.name||'?').trim().charAt(0).toUpperCase())+'</span></div>')+
-  '<div class="vb"><div class="vt">'+esc(g.name||'Chưa đặt tên')+'</div><div class="vm"><span class="tag" style="--c:'+a[2]+'"><i></i>'+a[1]+'</span>'+(g.year?'<span class="mini">'+IC.cal+esc(ymText(g.year))+'</span>':'')+(+g.target>0?'<span class="mini">'+money(goalSaved(g),1)+' / '+money(g.target,1)+'</span>':'')+(goalBudgetLine(g)?'<span class="mini">'+IC.wallet+goalBudgetLine(g)+'</span>':'')+(goalSpent(g)?'<span class="mini">đã chi '+money(goalSpent(g),1)+'</span>':'')+'</div><div class="vp">'+bar(p,a[2])+'<span>'+(p>=100?'Đã đạt 🎉':p+'%')+'</span></div></div></div>'}).join('')+
-  '<button class="vadd" data-mnew="goals"'+(f?' data-g="'+f+'"':'')+'>'+IC.plus+'<span>Thêm mục tiêu</span></button></div></div>';return h}
+ var EMO={career:'💼',study:'📚',health:'🌿',money:'💰',life:'✈️',self:'✨'};
+ h+='<div class="vgrid">'+L.map(function(g){var a=opt(fld('goals','area'),g.area),p=goalProg(g),sv=goalSaved(g),bl=goalBudgetLine(g);
+  return'<div class="vcard'+(p>=100?' vdone':'')+'" draggable="true" data-gk="'+g.id+'" data-orec="goals:'+g.id+'" style="--c:'+a[2]+'">'+(g.img?'<div class="vimg"><img src="'+esc(g.img)+'" alt="" loading="lazy"></div>':'<div class="vimg vph"><span>'+(EMO[g.area]||'⭐')+'</span></div>')+
+  '<div class="vb"><div class="vtop"><span class="vdot"></span><span>'+a[1]+'</span>'+(g.year?'<span class="vsep">·</span><span>'+esc(ymText(g.year))+'</span>':'')+'</div><div class="vt">'+esc(g.name||'Chưa đặt tên')+'</div>'+
+  (+g.target>0?'<div class="vmoney"><b>'+money(sv,1)+'</b><span> / '+money(g.target,1)+'</span></div>':'<div class="vmoney muted">'+(p?'Tiến độ':'Chưa bắt đầu')+'</div>')+
+  '<div class="vp">'+bar(p,a[2])+'<span>'+(p>=100?'🎉':p+'%')+'</span></div>'+
+  (bl||goalSpent(g)?'<div class="vfoot">'+(bl?'<span>+'+bl+'</span>':'')+(goalSpent(g)?'<span>đã chi '+money(goalSpent(g),1)+'</span>':'')+'</div>':'')+'</div></div>'}).join('')+
+  '<button class="vadd" data-mnew="goals"'+(f?' data-g="'+f+'"':'')+'><span class="vplus">'+IC.plus+'</span><span>Thêm mục tiêu</span></button></div></div>';return h}
 function goalPanel(r){var h='',gk=catOfGoal(r);if(gk){var gb=+budOf(finMonth())[gk]||0;h+='<div class="sec"><div class="sec-h">Phân bổ mỗi tháng<span>'+(gb?money(gb):'chưa đặt')+'</span><span class="sp"></span><button class="pill" data-view="money" data-fvgo="plan">'+IC.wallet+'Sửa ở Kế hoạch</button></div><div class="note">Liên kết với hạng mục “'+esc(catName(gk))+'” trong Kế hoạch phân chia. Đổi tên ở một bên, bên kia đổi theo.</div></div>'}
  h+='<div class="sec"><div class="sec-h">Ảnh</div>'+(r.img?'<img class="gimg" src="'+esc(r.img)+'" alt="">':'')+'<div class="rmd"><label class="pill">'+IC.img+(r.img?'Đổi ảnh':'Tải ảnh lên')+'<input type="file" accept="image/*" data-goalimg hidden></label>'+(r.img?'<button class="pill" data-a="goalimgdel">'+IC.trash+'Bỏ ảnh</button>':'')+'</div><input class="addin" data-goalurl inputmode="url" placeholder="+ Hoặc dán link ảnh (Pinterest, Unsplash…) rồi Enter"></div>';
  var p=goalProg(r),a=opt(fld('goals','area'),r.area);h+='<div class="sec"><div class="sec-h">Tiến độ<span>'+p+'%</span></div>'+bar(p,a[2]).replace('class="bar"','class="bar big"')+'<div class="note" style="margin-top:8px">Tự tính từ dự án / môn / việc đã gắn và quỹ tiết kiệm. Nếu chưa gắn gì và không có số tiền cần, bạn tự nhập % ở ô “Tiến độ tự nhập”.</div></div>';
@@ -1322,8 +1334,8 @@ function planView(L,tin,tout,tsv){autoLink();var mo=finMonth(),I=(S.settings.inc
  h+='<div class="fsec"><div class="sec-h">Phân chia '+monthText(mo).toLowerCase()+'<span>'+(base?'trên '+money(base,1)+(fix||hasVar?(hasVar?' = '+money(fix,1)+' cố định + '+money(base-fix,1)+' không cố định':''):' (theo số thực nhận)'):'')+'</span><span class="sp"></span>'+(!Object.keys(B).length&&prevBud(mo)?'<button class="pill" data-a="budcopy">Chép từ '+monthText(prevBud(mo)).replace('Tháng ','T')+'</button>':'')+'<button class="pill" data-a="pedit">'+(ed?'Xong':'Sửa hạng mục')+'</button>'+(base&&!ed?'<button class="pill" data-a="planhint">Điền gợi ý</button>':'')+'</div>';
  if(!base)h+='<div class="note">Thêm nguồn thu ở trên để chia theo %.</div>';
  h+='<div class="ptb al"><div class="ptr ph"><span>Hạng mục</span><span class="r">%</span><span class="r">Dự tính</span><span class="r">Đã dùng</span><span class="r">Còn lại</span></div>';
- h+=rows.map(function(r){var b=+B[r[0]]||0,pc=base&&b?Math.round(b/base*1000)/10:'',rem=b-r[3],over=b&&rem<0;
-  return'<div class="ptr">'+(ed?'<span class="fl fle">'+(r[0]==='__save'?'<i style="background:'+r[2]+'"></i>':'<button class="swb" data-fcsw="'+r[0]+'" style="background:'+r[2]+'" title="Đổi màu"></button>')+'<input class="inp" data-fcname="'+r[0]+'" value="'+esc(r[1])+'">'+(r[0]==='khac'?'':'<button class="ib gstar'+(goalOfCat(r[0])?' on':'')+'" data-fcgoal="'+r[0]+'" title="'+(goalOfCat(r[0])?'Đang hiện trên Vision board — bấm để bỏ liên kết':'Thêm vào Vision board')+'">'+IC.star+'</button>')+(r[0]==='__save'||r[0]==='khac'?'':'<button class="ib" data-fcdel="'+r[0]+'" title="Xoá hạng mục">'+IC.trash+'</button>')+'</span>':'<span class="fl"><i style="background:'+r[2]+'"></i>'+esc(r[1])+(goalOfCat(r[0])?'<button class="gl" data-orec="goals:'+goalOfCat(r[0]).id+'" title="Mở trên Vision board">'+IC.star+'</button>':r[0]==='khac'?'':'<button class="gl off" data-fcgoal="'+r[0]+'" title="Nối với mục tiêu trên Vision board">'+IC.star+'</button>')+'</span>')+'<input class="inp r" data-alpct="'+r[0]+'" inputmode="decimal" value="'+pc+'" placeholder="–"'+(base?'':' disabled')+'><input class="inp r" data-alamt="'+r[0]+'" inputmode="decimal" value="'+(b?b.toLocaleString('vi-VN'):'')+'" placeholder="–"><span class="r mu">'+(r[3]?money(r[3],1):'–')+'</span><span class="r'+(over?' over':b?' ok':' mu')+'">'+(b?(over?'−'+money(-rem,1):money(rem,1)):'–')+'</span></div>'}).join('');
+ rows=planSort(rows);h+=rows.map(function(r){var b=+B[r[0]]||0,pc=base&&b?Math.round(b/base*1000)/10:'',rem=b-r[3],over=b&&rem<0;
+  return'<div class="ptr prow3" draggable="true" data-pk="'+r[0]+'"><span class="pgrip">⋮⋮</span>'+(ed?'<span class="fl fle">'+(r[0]==='__save'?'<i style="background:'+r[2]+'"></i>':'<button class="swb" data-fcsw="'+r[0]+'" style="background:'+r[2]+'" title="Đổi màu"></button>')+'<input class="inp" data-fcname="'+r[0]+'" value="'+esc(r[1])+'">'+(r[0]==='khac'?'':'<button class="ib gstar'+(goalOfCat(r[0])?' on':'')+'" data-fcgoal="'+r[0]+'" title="'+(goalOfCat(r[0])?'Đang hiện trên Vision board — bấm để bỏ liên kết':'Thêm vào Vision board')+'">'+IC.star+'</button>')+(r[0]==='__save'||r[0]==='khac'?'':'<button class="ib" data-fcdel="'+r[0]+'" title="Xoá hạng mục">'+IC.trash+'</button>')+'</span>':'<span class="fl"><i style="background:'+r[2]+'"></i>'+esc(r[1])+(goalOfCat(r[0])?'<button class="gl" data-orec="goals:'+goalOfCat(r[0]).id+'" title="Mở trên Vision board">'+IC.star+'</button>':r[0]==='khac'?'':'<button class="gl off" data-fcgoal="'+r[0]+'" title="Nối với mục tiêu trên Vision board">'+IC.star+'</button>')+'</span>')+'<input class="inp r" data-alpct="'+r[0]+'" inputmode="decimal" value="'+pc+'" placeholder="–"'+(base?'':' disabled')+'><input class="inp r" data-alamt="'+r[0]+'" inputmode="decimal" value="'+(b?b.toLocaleString('vi-VN'):'')+'" placeholder="–"><span class="r mu">'+(r[3]?money(r[3],1):'–')+'</span><span class="r'+(over?' over':b?' ok':' mu')+'">'+(b?(over?'−'+money(-rem,1):money(rem,1)):'–')+'</span></div>'}).join('');
  if(ed)h+='<div class="ptr"><button class="pill" data-a="fcadd">'+IC.plus+'Thêm hạng mục</button><span></span><span></span><span></span><span></span></div>';
  h+='<div class="ptr pt"><span>Đã phân chia</span><b class="r">'+(base?Math.round(tot/base*100)+'%':'')+'</b><b class="r">'+money(tot,1)+'</b><span></span><span></span></div>';
  if(base)h+='<div class="ptr pt2"><span>'+(left>=0?'Chưa phân chia':'Vượt thu nhập')+'</span><span></span><b class="r '+(left>=0?'':'over')+'">'+money(Math.abs(left),1)+'</b><span></span><span></span></div>';
@@ -1424,6 +1436,17 @@ function flowSync(mo){if(!S.settings.incomes&&!S.settings.budgetM)return;var B=(
   if(+t.amount!==w.a||t.goal!==w.g.id||t.date!==last){t.amount=w.a;t.goal=w.g.id;t.date=last;ch=true}delete want[t.auto]});
  Object.keys(want).forEach(function(k){var w=want[k];recs('finance').push({id:uid(),created:Date.now(),cat:finCat(),kind:'save',amount:w.a,goal:w.g.id,fcat:'khac',auto:k,flowMo:mo,src:mo,date:last,name:'Tự chuyển vào quỹ: '+(w.g.name||catName(k)),checks:[],links:[]});ch=true});
  if(ch)changed();return ch}
+
+function planSort(rows){var O=S.settings.planOrder||[];return rows.slice().sort(function(a,b){var x=O.indexOf(a[0]),y=O.indexOf(b[0]);if(x<0)x=a[0]==='__save'?-1:999+rows.indexOf(a);if(y<0)y=b[0]==='__save'?-1:999+rows.indexOf(b);return x-y})}
+var dragK=null,dragT=null;
+document.addEventListener('dragstart',function(e){var r=e.target.closest&&e.target.closest('[data-pk],[data-gk]');if(!r||(e.target.closest('input,button')&&!e.target.closest('.pgrip')))return;dragT=r.dataset.pk?'pk':'gk';dragK=r.dataset.pk||r.dataset.gk;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',dragK)}catch(x){}r.classList.add('dragging');e.stopPropagation()},true);
+document.addEventListener('dragover',function(e){if(!dragK)return;var r=e.target.closest&&e.target.closest(dragT==='pk'?'[data-pk]':'[data-gk]');if(!r||r.dataset[dragT]===dragK)return;e.preventDefault();e.stopPropagation();$$('.dz-a,.dz-b').forEach(function(x){x.classList.remove('dz-a','dz-b')});var b=r.getBoundingClientRect(),after=dragT==='pk'?e.clientY>b.top+b.height/2:e.clientX>b.left+b.width/2;r.classList.add(after?'dz-b':'dz-a')},true);
+document.addEventListener('drop',function(e){if(!dragK)return;var r=e.target.closest&&e.target.closest(dragT==='pk'?'[data-pk]':'[data-gk]'),k=dragK,t=dragT;dragK=null;if(!r||r.dataset[t]===k){cleanDz();return}e.preventDefault();e.stopPropagation();var after=r.classList.contains('dz-b'),to=r.dataset[t];cleanDz();
+ if(t==='pk'){var keys=$$('[data-pk]').map(function(x){return x.dataset.pk}).filter(function(x){return x!==k});var i=keys.indexOf(to);keys.splice(after?i+1:i,0,k);S.settings.planOrder=keys;var F=S.settings.fcats||[];F.sort(function(a,b){var x=keys.indexOf(a[0]),y=keys.indexOf(b[0]);return(x<0?999:x)-(y<0?999:y)});syncFcats()}
+ else{var G=recs('goals'),g=rec('goals',k),tg=rec('goals',to);G.splice(G.indexOf(g),1);var j=G.indexOf(tg);G.splice(after?j+1:j,0,g)}
+ changed();renderMain()},true);
+function cleanDz(){$$('.dz-a,.dz-b,.dragging').forEach(function(x){x.classList.remove('dz-a','dz-b','dragging')})}
+document.addEventListener('dragend',function(){dragK=null;cleanDz()},true);
 
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){
