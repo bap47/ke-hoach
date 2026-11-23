@@ -3,7 +3,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const TZ_OFF = 7; // Asia/Ho_Chi_Minh
 const pad = (n: number) => String(n).padStart(2, "0");
-const esc = (s: string) => String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+const esc = (s: string) => String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
 function utc(local: string) { // 'YYYY-MM-DDTHH:MM' giờ VN -> 'YYYYMMDDTHHMMSSZ'
   const [d, t] = local.split("T"); const [y, m, dd] = d.split("-").map(Number); const [hh, mm] = (t || "09:00").split(":").map(Number);
   const x = new Date(Date.UTC(y, m - 1, dd, hh - TZ_OFF, mm));
@@ -24,7 +24,8 @@ Deno.serve(async (req) => {
   if (!key) { try { const o = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}"); key = (Object.values(o)[0] as string) || ""; } catch (_) { /* */ } }
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, key);
   const { data, error } = await sb.from("boards").select("data").eq("data->settings->>calToken", tk).limit(1);
-  if (error || !data || !data.length) return new Response("Không tìm thấy lịch", { status: 404 });
+  if (error) return new Response("Lỗi: " + error.message + " | key:" + (key ? key.slice(0, 8) : "none"), { status: 500 });
+  if (!data || !data.length) return new Response("Không tìm thấy lịch | key:" + (key ? key.slice(0, 8) : "none"), { status: 404 });
   const S = data[0].data || {};
   const cats: Record<string, string> = {}; (S.cats || []).forEach((c: any) => cats[c.id] = c.name);
   const now = new Date(), stamp = utc(new Date(now.getTime() + TZ_OFF * 36e5).toISOString().slice(0, 16));
