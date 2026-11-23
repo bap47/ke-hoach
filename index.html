@@ -534,6 +534,9 @@ button.pv:hover{background:var(--hover)}
 .stats4 .st4{border-radius:16px}
 @media(max-width:860px){.fhero{grid-template-columns:1fr 1fr}.fhero .fh1{grid-column:1/-1}.fhero b{font-size:22px}}
 @media(max-width:860px){.ptb.al .ptr>:nth-child(4){display:revert}.ptb.al .ptr.prow3>:nth-child(4){display:block}.ptb.al .ptr.prow3>:nth-child(5){display:none}.ptb.al .ptr:not(.prow3)>:nth-child(4){display:none}.fsec .sec-h .pill{font-size:12px}}
+.dpsel{display:inline-flex;align-items:center;gap:2px;margin-left:auto;background:var(--chip);border-radius:8px;padding:2px 6px;font-variant-numeric:tabular-nums}
+.dpsel select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font:inherit;font-size:14px;font-weight:600;color:var(--ink);padding:4px 2px;cursor:pointer;text-align:center}
+.dpsel select:focus{outline:none;background:var(--panel);border-radius:5px}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -833,7 +836,7 @@ function datePop2(anchor,val,withTime,cb){var t={due:val};var apply=function(k,v
   var h='<div class="dpq"><button data-dq="'+ymd(q)+'">Hôm nay</button><button data-dq="'+ymd(tmr)+'">Ngày mai</button><button data-dq="'+ymd(nw)+'">Thứ 2 tới</button>'+(t.due?'<button data-dq="" class="danger">Xoá</button>':'')+'</div>';
   h+='<div class="dph"><button data-dm="-1">‹</button><b>Tháng '+(m+1)+', '+y+'</b><button data-dm="1">›</button></div><div class="dpg">'+['T2','T3','T4','T5','T6','T7','CN'].map(function(x){return'<span>'+x+'</span>'}).join('');
   for(var i=0;i<42;i++){var d=new Date(st);d.setDate(st.getDate()+i);var k=ymd(d);if(i===35&&d.getMonth()!==m)break;h+='<button data-dd="'+k+'" class="'+(d.getMonth()!==m?'out ':'')+(k===today?'td ':'')+(k===sel?'on':'')+'">'+d.getDate()+'</button>'}
-  h+='</div><div class="dpt"><span>Giờ</span>'+['08:00','09:00','12:00','15:00','18:00','21:00'].map(function(x){return'<button data-dt="'+x+'" class="'+(x===tm?'on':'')+'">'+x.replace(':00','h')+'</button>'}).join('')+'<input type="time" value="'+tm+'" class="dpin"></div>';if(!withTime)h=h.replace(/<div class="dpt">[\s\S]*$/,'');
+  h+='</div><div class="dpt"><span>Giờ</span>'+['08:00','09:00','12:00','15:00','18:00','21:00'].map(function(x){return'<button data-dt="'+x+'" class="'+(x===tm?'on':'')+'">'+x.replace(':00','h')+'</button>'}).join('')+'<span class="dpsel"><select class="dph2">'+Array.from({length:24},function(_,i){var v=pad(i);return'<option'+(v===tm.slice(0,2)?' selected':'')+'>'+v+'</option>'}).join('')+'</select>:<select class="dpm2">'+(function(){var mm=tm.slice(3,5),L=[];for(var i=0;i<60;i+=5)L.push(pad(i));if(L.indexOf(mm)<0)L.push(mm);return L.sort().map(function(v){return'<option'+(v===mm?' selected':'')+'>'+v+'</option>'}).join('')})()+'</select></span></div>';if(!withTime)h=h.replace(/<div class="dpt">[\s\S]*$/,'');
   el.innerHTML=h;if(innerWidth>860){var r=anchor.getBoundingClientRect(),w=el.offsetWidth,hh=el.offsetHeight;el.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';el.style.top=(r.bottom+hh+8>innerHeight?Math.max(8,r.top-hh-4):r.bottom+4)+'px'}}
  draw();sc.onclick=closePop;
  el.onclick=function(e){var b=e.target.closest('button');if(!b)return;var d=b.dataset;
@@ -841,7 +844,7 @@ function datePop2(anchor,val,withTime,cb){var t={due:val};var apply=function(k,v
   if(d.dt){tm=d.dt;if(t.due){set(t.due.slice(0,10));}draw();return}
   if(d.dd!=null){closePop();set(d.dd);return}
   if(d.dq!=null){closePop();set(d.dq);return}};
- el.onchange=function(e){if(e.target.classList.contains('dpin')&&e.target.value){tm=e.target.value;if(t.due)set(t.due.slice(0,10));draw()}}}
+ el.onchange=function(e){if(e.target.matches('.dph2,.dpm2')){tm=$('.dph2',el).value+':'+$('.dpm2',el).value;if(t.due)set(t.due.slice(0,10));draw()}}}
 
 /* ---------- reminders ---------- */
 function gcal(t){var s=new Date(t.due),e=new Date(s.getTime()+30*6e4);function f(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'}
