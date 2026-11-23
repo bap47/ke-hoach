@@ -20,7 +20,9 @@ function fold(line: string) { const out: string[] = []; let s = line; while (new
 Deno.serve(async (req) => {
   const tk = new URL(req.url).searchParams.get("t") || "";
   if (tk.length < 20) return new Response("Thiếu mã lịch", { status: 400 });
-  const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  let key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  if (!key) { try { const o = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}"); key = (Object.values(o)[0] as string) || ""; } catch (_) { /* */ } }
+  const sb = createClient(Deno.env.get("SUPABASE_URL")!, key);
   const { data, error } = await sb.from("boards").select("data").eq("data->settings->>calToken", tk).limit(1);
   if (error || !data || !data.length) return new Response("Không tìm thấy lịch", { status: 404 });
   const S = data[0].data || {};
