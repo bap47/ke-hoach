@@ -411,6 +411,10 @@ button.pv:hover{background:var(--hover)}
 #authf input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
 .autherr{color:var(--danger);font-size:13.5px;min-height:18px}
 .authbtn{justify-content:center;padding:12px;font-size:15px;border-radius:10px}
+
+.ws .av{cursor:pointer;overflow:hidden}.av.img,.avbig.img{background:none;padding:0}.av.img img{width:22px;height:22px;border-radius:6px;object-fit:cover;display:block}
+.avrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.avbig{width:56px;height:56px;border-radius:14px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:24px;font-weight:700;overflow:hidden}.avbig img{width:56px;height:56px;object-fit:cover;display:block}
+.ws .av{width:24px;height:24px;border-radius:7px}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -556,7 +560,7 @@ function renderSide(){var act=S.tasks.filter(active);
  function cnt(v){return S.tasks.filter(function(t){return inView(t,v)&&active(t)}).length}
  function nav(v,ic,name,n,red){return'<button class="nav'+(UI.view===v?' on':'')+'" data-view="'+v+'">'+ic+'<span>'+esc(name)+'</span>'+(n?'<span class="n'+(red?' red':'')+'">'+n+'</span>':'')+'</button>'}
  var over=cnt('over');
- var h='<div class="ws"><span class="av">'+esc((S.settings.title.replace(/^Kế hoạch của /,'')||'B')[0].toUpperCase())+'</span><b>'+esc(S.settings.title)+'</b><button class="ib" data-a="settings" title="Tuỳ chỉnh">'+IC.gear+'</button></div>';
+ var h='<div class="ws">'+avatarHTML('av')+'<b>'+esc(S.settings.title)+'</b><button class="ib" data-a="settings" title="Tuỳ chỉnh">'+IC.gear+'</button></div>';
  h+='<button class="srch" data-a="palette">'+IC.search+'<span>Tìm hoặc ra lệnh</span><kbd>⌘K</kbd></button>';
  h+=nav('overview',IC.home,'Tổng quan',0)+nav('today',IC.today,'Hôm nay',cnt('today'))+nav('upcoming',IC.upcoming,'Sắp tới',cnt('upcoming'))+(over?nav('over',IC.over,'Quá hạn',over,true):'')+nav('all',IC.all,'Tất cả việc',act.length)+nav('cal',IC.cal,'Lịch tổng',0);
 
@@ -567,6 +571,11 @@ function renderSide(){var act=S.tasks.filter(active);
   if(open)s+='<div class="subnav">'+catMods(c).map(function(m){var L=recs(m).filter(function(r){return r.cat===c.id}),k=m==='projects'?L.filter(function(r){return r.status==='active'}).length:m==='content'?L.filter(function(r){return r.status!=='posted'}).length:m==='orders'?L.filter(function(r){return r.status!=='done'}).length:m==='metrics'?0:L.length;return'<button class="nav sub'+(UI.view==='c:'+c.id+':'+m?' on':'')+'" data-view="c:'+c.id+':'+m+'">'+IC[MODS[m].ic]+'<span>'+esc(MODS[m].name)+'</span>'+(k?'<span class="n">'+k+'</span>':'')+'</button>'+(m==='projects'||m==='courses'?L.filter(function(r){return r.status!=='done'}).map(function(r){return'<button class="nav sub2'+(UI.orec===m+':'+r.id?' on':'')+'" data-orec="'+m+':'+r.id+'"><span class="dot" style="background:'+c.color+'"></span><span>'+esc(r.name||'Chưa đặt tên')+'</span></button>'}).join(''):'')}).join('')+'</div>';return s}).join('');
  h+='<div class="sidefoot"><button class="nav" data-a="settings">'+IC.gear+'<span>Tuỳ chỉnh</span></button></div>';
  $('#side').innerHTML=h}
+function avatarHTML(cls){var s=S.settings;if(s.avatar)return'<span class="'+cls+' img" data-a="settings" title="Đổi ảnh đại diện"><img src="'+esc(s.avatar)+'" alt=""></span>';return'<span class="'+cls+'" data-a="settings" title="Đổi ảnh đại diện">'+esc((s.title.replace(/^Kế hoạch của /,'')||'B')[0].toUpperCase())+'</span>'}
+function pickAvatar(file){if(!file||!/^image\//.test(file.type))return toast('Chọn một file ảnh nhé');var img=new Image(),url=URL.createObjectURL(file);
+ img.onload=function(){var n=160,c=document.createElement('canvas');c.width=c.height=n;var x=c.getContext('2d'),m=Math.min(img.width,img.height);x.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,n,n);URL.revokeObjectURL(url);
+  S.settings.avatar=c.toDataURL('image/jpeg',.85);changed();renderSide();var p=$('#avprev');if(p)p.outerHTML=avatarHTML('avbig').replace('class="avbig','id="avprev" class="avbig');toast('Đã đổi ảnh đại diện')};
+ img.onerror=function(){toast('Không đọc được ảnh này')};img.src=url}
 function renderMain(){if(modMain())return;var list=sorted(S.tasks.filter(function(t){return UI.layout==='cal'?(UI.view.indexOf('p:')===0?inView(t):true):inView(t)}));
  if(UI.hideDone)list=list.filter(active);
  var h='<div class="top"><button class="ib mob" data-a="drawer" aria-label="Menu">'+IC.menu+'</button><div class="tt">'+(UI.layout==='cal'&&UI.view.indexOf('p:')!==0?IC.cal+'<span>Lịch · tất cả mảng</span>':viewIcon()+'<span>'+esc(viewName())+'</span>')+'</div><span class="sp"></span>';
@@ -716,6 +725,7 @@ function askAll(){var up=sorted(S.tasks.filter(function(t){return t.due&&active(
 
 /* ---------- settings ---------- */
 function settings(){closeDrawer();var h='<div class="mwrap" data-a="closemodal"><div class="modal set"><div class="mh"><b style="color:var(--ink)">Tuỳ chỉnh</b><span class="sp"></span><button class="ib" data-a="closemodal">'+IC.close+'</button></div><div class="mb" style="max-height:70vh;overflow:auto">';
+ h+='<div class="f"><label class="l">Ảnh đại diện</label><div class="avrow">'+avatarHTML('avbig').replace('class="avbig','id="avprev" class="avbig')+'<label class="pill">Chọn ảnh<input type="file" accept="image/*" id="avfile" hidden></label>'+(S.settings.avatar?'<button class="pill danger" data-a="avdel">Xoá ảnh</button>':'')+'</div></div>';
  h+='<div class="f"><label class="l">Tên không gian</label><input class="inp" id="s-title" value="'+esc(S.settings.title)+'"></div>';
  h+='<div class="f"><label class="l">Giao diện</label><div class="segs" style="display:inline-flex">'+[['auto','Theo máy'],['light','Sáng'],['dark','Tối']].map(function(x){return'<button class="'+(S.settings.theme===x[0]?'on':'')+'" data-theme-set="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</div></div>';
  h+='<div class="f"><label class="l">Màu nhấn</label><div class="sws">'+ACC.map(function(c){return'<button class="sw'+(S.settings.accent===c?' on':'')+'" style="background:'+c+'" data-acc="'+c+'"></button>'}).join('')+'</div></div>';
@@ -1048,6 +1058,7 @@ document.addEventListener('click',function(e){
   case'askall':askAll();break;
   case'addprojrow':var id2='c'+Date.now().toString(36),col=PCOL[S.cats.length%PCOL.length];$('#s-cats').insertAdjacentHTML('beforeend',projRow({id:id2,name:'',color:col,key:''}));var rr=$('#s-cats .prow:last-child .n');rr&&rr.focus();break;
   case'savesettings':saveSettings();break;
+  case'avdel':delete S.settings.avatar;changed();renderSide();settings();break;
   case'cleardone':if(d.sure){var n=S.tasks.filter(function(t){return!active(t)}).length;S.tasks=S.tasks.filter(active);$('#modal').innerHTML='';if(UI.open&&!task(UI.open))closePanel();changed();renderAll();toast('Đã dọn '+n+' việc')}else{d.sure=1;b.textContent='Bấm lần nữa để dọn'}break;
   default:if(STORE.action(d.a,b))break}
 });
@@ -1057,7 +1068,7 @@ document.addEventListener('input',function(e){var el=e.target,d=el.dataset;
  if(d.df&&draft){draft[d.df]=el.value;autosize();return}
  if(d.ckt!=null){var t2=task(UI.open);t2.checks[+d.ckt].t=el.value;changed();return}
  if(el.id==='palq'){palSel=0;palRender(el.value)}});
-document.addEventListener('change',function(e){var el=e.target,d=el.dataset;
+document.addEventListener('change',function(e){var el=e.target,d=el.dataset;if(el.id==='avfile'){pickAvatar(el.files&&el.files[0]);return}
  if(d.f==='due'){var inModal=el.closest('#modal');var t=inModal?draft:task(UI.open);if(!t)return;t.due=el.value;if(inModal)return renderNew();changed();renderAll();renderPanel();return}
  if(d.chk!=null){var t2=task(UI.open);t2.checks[+d.chk].done=el.checked;changed();renderPanel();renderMain()}});
 document.addEventListener('keydown',function(e){var el=e.target,typing=/INPUT|TEXTAREA|SELECT/.test(el.tagName);
