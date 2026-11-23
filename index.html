@@ -471,6 +471,8 @@ button.pv:hover{background:var(--hover)}
 .fmon .segs{margin-right:6px}
 @media(max-width:860px){.ptb.al .ptr{grid-template-columns:1fr 46px 92px 74px;gap:6px;padding:6px 8px;font-size:12.5px}.ptb.al .ptr>:nth-child(4){display:none}.ptr{grid-template-columns:1fr 120px 30px}.fmon{flex-wrap:wrap}}
 @media(max-width:860px){.fmon .fvt{width:100%;margin:0 0 6px}.fmon .fvt button{flex:1}.fmon>.sp{display:none}}
+.ptr{grid-template-columns:1fr auto 160px 34px}.ptr .ivar{font-size:12px;white-space:nowrap}.ptr.pvar input.r{color:var(--mute)}
+@media(max-width:860px){.ptr{grid-template-columns:1fr auto 100px 28px}}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -1233,16 +1235,19 @@ document.addEventListener('change',function(e){var t=e.target;if(!t.dataset)retu
 
 var PLAN_HINT={nha:15,an:20,dilai:5,hoc:10,suckhoe:5,muasam:5,giaitri:5,qua:5,khac:5,__save:25};
 function planView(L,tin,tout,tsv){var I=S.settings.incomes=S.settings.incomes||[],B=S.settings.budget=S.settings.budget||{};
- var inc=I.reduce(function(s,x){return s+(+x.amount||0)},0),base=inc||tin;
+ var fix=I.filter(function(x){return!x.var}).reduce(function(s,x){return s+(+x.amount||0)},0),est=I.filter(function(x){return x.var}).reduce(function(s,x){return s+(+x.amount||0)},0),inc=fix+est,hasVar=I.some(function(x){return x.var});
+ var vrec=L.filter(function(t){return t.kind==='in'&&t.fcat!=='luong'}).reduce(function(s,t){return s+(+t.amount||0)},0);
+ var base=fix?fix+(hasVar?vrec:0):tin;
  var h='<div class="fsec"><div class="sec-h">Thu nhập hằng tháng<span>dự kiến</span></div><div class="ptb">';
- h+='<div class="ptr ph"><span>Nguồn thu</span><span class="r">Số tiền</span><span></span></div>';
- h+=I.map(function(x){return'<div class="ptr"><input class="inp" data-incname="'+x.id+'" value="'+esc(x.name||'')+'" placeholder="vd: Lương SNDQ"><input class="inp r" data-incamt="'+x.id+'" inputmode="decimal" value="'+(x.amount?(+x.amount).toLocaleString('vi-VN'):'')+'" placeholder="0"><button class="ib" data-incdel="'+x.id+'" title="Xoá">'+IC.close+'</button></div>'}).join('');
- h+='<div class="ptr"><button class="pill" data-a="incadd">'+IC.plus+'Thêm nguồn thu</button><span></span><span></span></div>';
- h+='<div class="ptr pt"><span>Tổng dự kiến</span><b class="r fin in">'+money(inc)+'</b><span></span></div>';
- h+='<div class="ptr pt2"><span>Thực nhận tháng này</span><span class="r">'+money(tin)+(inc?' <em class="'+(tin>=inc?'ok':'')+'">('+Math.round(tin/inc*100)+'%)</em>':'')+'</span><span></span></div></div></div>';
+ h+='<div class="ptr ph"><span>Nguồn thu</span><span></span><span class="r">Số tiền</span><span></span></div>';
+ h+=I.map(function(x){return'<div class="ptr'+(x.var?' pvar':'')+'"><input class="inp" data-incname="'+x.id+'" value="'+esc(x.name||'')+'" placeholder="vd: Lương SNDQ"><button class="chip ivar'+(x.var?' on2':'')+'" data-incvar="'+x.id+'" title="Bấm để đổi">'+(x.var?'Không cố định':'Cố định')+'</button><input class="inp r" data-incamt="'+x.id+'" inputmode="decimal" value="'+(x.amount?(+x.amount).toLocaleString('vi-VN'):'')+'" placeholder="'+(x.var?'ước tính (tuỳ)':'0')+'"><button class="ib" data-incdel="'+x.id+'" title="Xoá">'+IC.close+'</button></div>'}).join('');
+ h+='<div class="ptr"><button class="pill" data-a="incadd">'+IC.plus+'Thêm nguồn thu</button><span></span><span></span><span></span></div>';
+ h+='<div class="ptr pt"><span>Thu cố định</span><span></span><b class="r fin in">'+money(fix)+'</b><span></span></div>';
+ if(hasVar)h+='<div class="ptr pt2"><span>Không cố định · đã nhận tháng này</span><span></span><span class="r">'+money(vrec)+(est?' <em>/ ước ~'+money(est,1)+'</em>':'')+'</span><span></span></div>';
+ h+='<div class="ptr pt2"><span>Tổng thực nhận tháng này</span><span></span><span class="r">'+money(tin)+'</span><span></span></div></div>'+(hasVar?'<div class="note" style="margin-top:8px">Thu không cố định (freelance…) chỉ được đem ra chia khi bạn ghi khoản <b>Thu</b> thật ở Sổ thu chi, nên tháng ít job thì kế hoạch cũng tự co lại, không bị chia lố.</div>':'')+'</div>';
  var rows=[['__save','Tiết kiệm (cho mục tiêu)','#5E6AD2',tsv]].concat(FCATS.filter(function(c){return!/luong|freelance/.test(c[0])}).map(function(c){return[c[0],c[1],c[2],L.filter(function(t){return t.kind==='out'&&t.fcat===c[0]}).reduce(function(s,t){return s+(+t.amount||0)},0)]}));
  var tot=rows.reduce(function(s,r){return s+(+B[r[0]]||0)},0),left=base-tot;
- h+='<div class="fsec"><div class="sec-h">Phân chia thu nhập<span>'+(base?'trên '+money(base,1)+(inc?'':' (theo số thực nhận)'):'')+'</span><span class="sp"></span>'+(base?'<button class="pill" data-a="planhint">Điền gợi ý</button>':'')+'</div>';
+ h+='<div class="fsec"><div class="sec-h">Phân chia thu nhập<span>'+(base?'trên '+money(base,1)+(fix?(hasVar?' = '+money(fix,1)+' cố định + '+money(vrec,1)+' freelance đã nhận':''):' (theo số thực nhận)'):'')+'</span><span class="sp"></span>'+(base?'<button class="pill" data-a="planhint">Điền gợi ý</button>':'')+'</div>';
  if(!base)h+='<div class="note">Thêm nguồn thu ở trên để chia theo %.</div>';
  h+='<div class="ptb al"><div class="ptr ph"><span>Hạng mục</span><span class="r">%</span><span class="r">Dự tính</span><span class="r">Đã dùng</span><span class="r">Còn lại</span></div>';
  h+=rows.map(function(r){var b=+B[r[0]]||0,pc=base&&b?Math.round(b/base*1000)/10:'',rem=b-r[3],over=b&&rem<0;
@@ -1251,23 +1256,27 @@ function planView(L,tin,tout,tsv){var I=S.settings.incomes=S.settings.incomes||[
  if(base)h+='<div class="ptr pt2"><span>'+(left>=0?'Chưa phân chia':'Vượt thu nhập')+'</span><span></span><b class="r '+(left>=0?'':'over')+'">'+money(Math.abs(left),1)+'</b><span></span><span></span></div>';
  h+='</div><div class="note" style="margin-top:10px">Số dự tính của từng hạng mục cũng là ngân sách tháng ở “Sổ thu chi”. Nhập % hoặc số tiền, ô còn lại tự tính.</div></div>';
  return h}
-document.addEventListener('click',function(e){var b=e.target.closest('[data-fv],[data-a=incadd],[data-incdel],[data-a=planhint]');if(!b)return;e.stopPropagation();var d=b.dataset;
+document.addEventListener('click',function(e){var b=e.target.closest('[data-fv],[data-a=incadd],[data-incdel],[data-a=planhint],[data-incvar]');if(!b)return;e.stopPropagation();var d=b.dataset;
  if(d.fv){UI.fv=d.fv;saveUI();renderMain();return}
  S.settings.incomes=S.settings.incomes||[];
  if(d.a==='incadd'){var id=uid();S.settings.incomes.push({id:id,name:'',amount:''});changed();renderMain();var x=$('[data-incname="'+id+'"]');x&&x.focus();return}
+ if(d.incvar){S.settings.incomes.forEach(function(x){if(x.id===d.incvar)x.var=!x.var});changed();renderMain();return}
  if(d.incdel){S.settings.incomes=S.settings.incomes.filter(function(x){return x.id!==d.incdel});changed();renderMain();return}
- if(d.a==='planhint'){var inc=S.settings.incomes.reduce(function(s,x){return s+(+x.amount||0)},0)||0;if(!inc){var mo=finMonth();inc=recs('finance').filter(function(t){return t.kind==='in'&&fdate(t).slice(0,7)===mo}).reduce(function(s,t){return s+(+t.amount||0)},0)}
+ if(d.a==='planhint'){var inc=planBase();
   if(!d.sure&&Object.keys(S.settings.budget||{}).length){d.sure=1;b.textContent='Ghi đè số hiện tại?';return}
   S.settings.budget={};for(var k in PLAN_HINT)S.settings.budget[k]=Math.round(inc*PLAN_HINT[k]/100/1e4)*1e4;changed();renderMain();toast('Đã điền gợi ý — chỉnh lại cho hợp với bạn nhé');return}
 },true);
 document.addEventListener('change',function(e){var t=e.target,d=t.dataset;if(!d)return;var I=S.settings.incomes||[];
- function inc(){var s=I.reduce(function(a,x){return a+(+x.amount||0)},0);if(s)return s;var mo=finMonth();return recs('finance').filter(function(x){return x.kind==='in'&&fdate(x).slice(0,7)===mo}).reduce(function(a,x){return a+(+x.amount||0)},0)}
+ function inc(){return planBase()}
+ function _old(){var s=0;if(s)return s;var mo=finMonth();return recs('finance').filter(function(x){return x.kind==='in'&&fdate(x).slice(0,7)===mo}).reduce(function(a,x){return a+(+x.amount||0)},0)}
  if(d.incname){var x=I.filter(function(y){return y.id===d.incname})[0];if(x){x.name=t.value.trim();changed()}return}
  if(d.incamt){var y=I.filter(function(z){return z.id===d.incamt})[0];if(y){y.amount=parseMoney(t.value)||'';changed();renderMain()}return}
  var B=S.settings.budget=S.settings.budget||{};
  if(d.alamt!=null&&d.alamt!==''){var v=parseMoney(t.value);if(v)B[d.alamt]=v;else delete B[d.alamt];changed();renderMain();return}
  if(d.alpct){var p=parseFloat(String(t.value).replace(',','.'));if(p>0)B[d.alpct]=Math.round(inc()*p/100/1e3)*1e3;else delete B[d.alpct];changed();renderMain();return}
 },true);
+function planBase(){var I=S.settings.incomes||[],mo=finMonth(),L=recs('finance').filter(function(t){return t.kind==='in'&&fdate(t).slice(0,7)===mo});var fix=I.filter(function(x){return!x.var}).reduce(function(s,x){return s+(+x.amount||0)},0);
+ if(!fix)return L.reduce(function(s,t){return s+(+t.amount||0)},0);return fix+(I.some(function(x){return x.var})?L.filter(function(t){return t.fcat!=='luong'}).reduce(function(s,t){return s+(+t.amount||0)},0):0)}
 
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){
