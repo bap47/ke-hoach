@@ -415,6 +415,8 @@ button.pv:hover{background:var(--hover)}
 .ws .av{cursor:pointer;overflow:hidden}.av.img,.avbig.img{background:none;padding:0}.av.img img{width:22px;height:22px;border-radius:6px;object-fit:cover;display:block}
 .avrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.avbig{width:56px;height:56px;border-radius:14px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:24px;font-weight:700;overflow:hidden}.avbig img{width:56px;height:56px;object-fit:cover;display:block}
 .ws .av{width:24px;height:24px;border-radius:7px}
+
+.guests{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.guests .gl{width:100%;font-size:12.5px;color:var(--mute);font-weight:500}.gchip{display:inline-flex;align-items:center;gap:4px;padding:3px 4px 3px 10px;border-radius:999px;background:var(--chip);font-size:13px}.gchip button{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:var(--faint)}.gchip button svg{width:10px;height:10px}.guests .addin{flex:1;min-width:180px}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -645,7 +647,7 @@ function renderPanel(focusSel){if(!UI.open&&UI.orec)return renderRecPanel(focusS
  h+='<textarea class="desc-in" data-f="note" placeholder="Thêm mô tả, brief, ghi chú…">'+esc(t.note)+'</textarea>';
  h+='<div class="sec"><div class="sec-h">Việc nhỏ'+(t.checks.length?'<span>'+dn+'/'+t.checks.length+'</span>':'')+'</div>'+t.checks.map(function(k,i){return'<div class="ck'+(k.done?' on':'')+'"><input type="checkbox" data-chk="'+i+'"'+(k.done?' checked':'')+'><input class="ckt" data-ckt="'+i+'" value="'+esc(k.t)+'"><button class="x" data-ckdel="'+i+'">'+IC.close+'</button></div>'}).join('')+'<input class="addin" data-ckadd placeholder="+ Thêm việc nhỏ rồi Enter"></div>';
  h+='<div class="sec"><div class="sec-h">Link<span>'+(t.links.length||'')+'</span></div>'+t.links.map(function(u,i){var ho=host(u);return'<div class="lkr"><span class="fv">'+esc(ho[0]?ho[0].toUpperCase():'↗')+'</span><a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(ho)+'<small>'+esc(u.replace(/^https?:\/\/(www\.)?/,'').slice(ho.length,ho.length+40))+'</small></a><button class="x" data-lkdel="'+i+'">'+IC.close+'</button></div>'}).join('')+'<input class="addin" data-lkadd inputmode="url" placeholder="+ Dán link (Drive, Canva, Figma…) rồi Enter"></div>';
- if(t.due)h+='<div class="sec"><div class="sec-h">Nhắc trên điện thoại & MacBook</div><div class="rmd"><a class="pill" href="'+gcal(t)+'" target="_blank" rel="noopener">'+IC.cal+'Thêm vào Google Calendar</a><button class="pill" data-a="ask1">'+IC.bell+'Copy để nhờ Claude đặt nhắc</button></div><div class="note">Google Calendar đồng bộ mọi máy, kèm link. Muốn nhắc đúng “'+lbl(REMS,+t.remind)+'” trong app Nhắc nhở (iCloud → MacBook): bấm Copy rồi dán vào chat với Claude trên điện thoại.</div></div>';
+ if(t.due)h+='<div class="sec"><div class="sec-h">Nhắc trên điện thoại & MacBook</div><div class="rmd"><a class="pill" href="'+gcal(t)+'" target="_blank" rel="noopener">'+IC.cal+'Thêm vào Google Calendar</a><button class="pill" data-a="ask1">'+IC.bell+'Copy để nhờ Claude đặt nhắc</button></div><div class="guests"><div class="gl">Mời người khác cùng nhận nhắc</div>'+(t.guests||[]).map(function(g,i){return'<span class="gchip">'+esc(g)+'<button data-gdel="'+i+'" aria-label="Bỏ">'+IC.close+'</button></span>'}).join('')+'<input class="addin" data-gadd type="email" inputmode="email" placeholder="+ Email bạn bè rồi Enter"></div><div class="note">'+((t.guests&&t.guests.length)?'Bấm “Thêm vào Google Calendar” rồi Lưu: Google sẽ gửi lời mời tới '+t.guests.length+' người, họ chấp nhận là điện thoại họ cũng được nhắc. ':'')+'Google Calendar đồng bộ mọi máy, kèm link. Muốn nhắc đúng “'+lbl(REMS,+t.remind)+'” trong app Nhắc nhở (iCloud → MacBook): bấm Copy rồi dán vào chat với Claude trên điện thoại.</div></div>';
  h+='</div></div>';w.innerHTML=h;autosize();
  if(focusSel){var f=$(focusSel,w);if(f)f.focus()}}
 function autosize(){$$('.ttl-in,.desc-in').forEach(function(a){a.style.height='auto';a.style.height=a.scrollHeight+'px'})}
@@ -703,7 +705,7 @@ function datePop2(anchor,val,withTime,cb){var t={due:val};var apply=function(k,v
 /* ---------- reminders ---------- */
 function gcal(t){var s=new Date(t.due),e=new Date(s.getTime()+30*6e4);function f(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'}
  var u='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('['+tid(t)+'] '+t.title)+'&dates='+f(s)+'/'+f(e)+'&ctz=Asia/Ho_Chi_Minh&details='+encodeURIComponent((t.note?t.note+'\n\n':'')+(t.links.length?'Link:\n'+t.links.join('\n')+'\n\n':'')+'Mảng: '+cat(t.cat).name);
- if(t.repeat!=='none')u+='&recur='+encodeURIComponent('RRULE:FREQ='+{daily:'DAILY',weekly:'WEEKLY',monthly:'MONTHLY'}[t.repeat]);return u}
+ if(t.repeat!=='none')u+='&recur='+encodeURIComponent('RRULE:FREQ='+{daily:'DAILY',weekly:'WEEKLY',monthly:'MONTHLY'}[t.repeat]);if(t.guests&&t.guests.length)u+='&add='+encodeURIComponent(t.guests.join(','));return u}
 function askText(list){return'Đặt nhắc nhở trên điện thoại cho mình:\n'+list.map(function(t){var d=new Date(t.due);return'- ['+tid(t)+'] '+t.title+' — '+pad(d.getHours())+':'+pad(d.getMinutes())+' '+pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+', '+lbl(REMS,+t.remind).replace('trước','').trim()+' trước'+(t.repeat!=='none'?', '+lbl(REPS,t.repeat).toLowerCase():'')+(t.links.length?', gắn link: '+t.links.join(' , '):'')}).join('\n')}
 function copy(txt,msg){if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){toast(msg)}).catch(function(){showCopy(txt)});else showCopy(txt)}
 function showCopy(txt){$('#modal').innerHTML='<div class="mwrap" data-a="closemodal"><div class="modal"><div class="mh">Copy đoạn này<span class="sp"></span><button class="ib" data-a="closemodal">'+IC.close+'</button></div><div class="mb"><textarea class="inp" rows="8" readonly>'+esc(txt)+'</textarea></div></div></div>'}
@@ -1024,7 +1026,7 @@ function applyTheme(){var t=S.settings.theme||'auto';if(t==='auto')document.docu
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){
  if(e.target.closest('a[href]'))return;
- var b=e.target.closest('[data-a],[data-view],[data-pop],[data-open],[data-pal],[data-acc],[data-delcat],[data-ckdel],[data-lkdel],[data-day],[data-modt],[data-exp]');if(!b)return;var d=b.dataset;
+ var b=e.target.closest('[data-a],[data-view],[data-pop],[data-open],[data-pal],[data-acc],[data-delcat],[data-ckdel],[data-lkdel],[data-day],[data-modt],[data-exp],[data-gdel]');if(!b)return;var d=b.dataset;
  if(d.a==='closemodal'&&b.classList.contains('mwrap')&&e.target!==b)return;
  if(d.modt!=null){b.classList.toggle('on');return}
  if(d.exp){UI.exp=UI.exp||{};var cur=UI.exp[d.exp]!==undefined?UI.exp[d.exp]:vcat()===d.exp;UI.exp[d.exp]=!cur;saveUI();renderSide();return}
@@ -1035,6 +1037,7 @@ document.addEventListener('click',function(e){
  if(d.acc){S.settings.accent=d.acc;document.documentElement.style.setProperty('--accent',d.acc);$$('.sw').forEach(function(s){s.classList.toggle('on',s.dataset.acc===d.acc)});return}
  if(d.delcat){if(S.tasks.some(function(t){return t.cat===d.delcat}))return toast('Mảng này còn việc — chuyển việc sang mảng khác trước nhé');var pr=b.closest('.prow'),nx=pr.nextElementSibling;if(nx&&nx.classList.contains('pmods'))nx.remove();pr.remove();return}
  if(d.ckdel){var t1=task(UI.open);t1.checks.splice(+d.ckdel,1);changed();renderPanel();renderMain();return}
+ if(d.gdel){var tg=task(UI.open);tg.guests.splice(+d.gdel,1);changed();renderPanel();return}
  if(d.lkdel){var t2=task(UI.open);t2.links.splice(+d.lkdel,1);changed();renderPanel();renderMain();return}
  if(d.open&&!d.a){openTask(d.open);return}
  if(d.day&&!d.a){UI.calSel=d.day;saveUI();renderMain();return}
@@ -1074,6 +1077,7 @@ document.addEventListener('change',function(e){var el=e.target,d=el.dataset;if(e
  if(d.chk!=null){var t2=task(UI.open);t2.checks[+d.chk].done=el.checked;changed();renderPanel();renderMain()}});
 document.addEventListener('keydown',function(e){var el=e.target,typing=/INPUT|TEXTAREA|SELECT/.test(el.tagName);
  if(el.dataset&&el.dataset.ckadd!=null&&e.key==='Enter'){e.preventDefault();var v=el.value.trim();if(!v)return;task(UI.open).checks.push({t:v,done:false});changed();renderPanel('[data-ckadd]');renderMain();return}
+ if(el.dataset&&el.dataset.gadd!=null&&e.key==='Enter'){e.preventDefault();var g=el.value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g))return toast('Email chưa đúng');var tt=task(UI.open);tt.guests=tt.guests||[];if(tt.guests.indexOf(g)<0)tt.guests.push(g);changed();renderPanel('[data-gadd]');return}
  if(el.dataset&&el.dataset.lkadd!=null&&e.key==='Enter'){e.preventDefault();var u=fixUrl(el.value);if(!u)return;task(UI.open).links.push(u);changed();renderPanel('[data-lkadd]');renderMain();return}
  if(el.id==='palq'){if(e.key==='ArrowDown'){e.preventDefault();palSel=Math.min(palSel+1,palItems.length-1);palRender(el.value)}else if(e.key==='ArrowUp'){e.preventDefault();palSel=Math.max(palSel-1,0);palRender(el.value)}else if(e.key==='Enter'){e.preventDefault();palRun(palSel)}else if(e.key==='Escape')$('#modal').innerHTML='';return}
  if(el.dataset&&el.dataset.df==='title'&&e.key==='Enter'){e.preventDefault();create();return}
