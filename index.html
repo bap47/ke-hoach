@@ -1272,7 +1272,7 @@ var PLAN_HINT={nha:15,an:20,dilai:5,hoc:10,suckhoe:5,muasam:5,giaitri:5,qua:5,kh
 function planView(L,tin,tout,tsv){var mo=finMonth(),I=(S.settings.incomes=S.settings.incomes||[]).filter(function(x){return!x.month||x.month===mo}),B=S.settings.budget=S.settings.budget||{};
  var fix=I.filter(function(x){return!x.var}).reduce(function(s,x){return s+(+x.amount||0)},0),est=I.filter(function(x){return x.var}).reduce(function(s,x){return s+(+x.amount||0)},0),inc=fix+est,hasVar=I.some(function(x){return x.var});
  var vrec=L.filter(function(t){return t.kind==='in'&&t.fcat!=='luong'}).reduce(function(s,t){return s+(+t.amount||0)},0);
- var base=fix?fix+(hasVar?vrec:0):tin;
+ var base=planBase();
  var today=ymd(new Date()),curMo=today.slice(0,7),dnow=+today.slice(8,10),dim=new Date(+mo.slice(0,4),+mo.slice(5,7),0).getDate();
  function rcv(x){return L.filter(function(t){return t.kind==='in'&&t.inc===x.id}).reduce(function(s,t){return s+(+t.amount||0)},0)}
  function pday(x){return x.day?Math.min(+x.day,dim):0}
@@ -1293,10 +1293,10 @@ function planView(L,tin,tout,tsv){var mo=finMonth(),I=(S.settings.incomes=S.sett
  if(tout||tsv)h+='<div class="ptr pt2 sumr"><span>Còn trong tay (sau khi trừ chi '+money(tout,1)+' & tiết kiệm '+money(tsv,1)+')</span><b class="r'+(tin-tout-tsv<0?' over':'')+'">'+money(tin-tout-tsv)+'</b></div>';
  if(pend)h+='<div class="ptr pt2 sumr"><span>Sắp nhận'+(pendL.length?' (ngày '+pendL.sort(function(a,b){return a-b}).map(pad).join(', ')+')':'')+'</span><span class="r">'+money(pend)+'</span></div>';
  if(hasVar&&vrec)h+='<div class="ptr pt2 sumr"><span>Trong đó không cố định đã về</span><span class="r">'+money(vrec)+(est?' <em>/ ước ~'+money(est,1)+'</em>':'')+'</span></div>';
- h+='</div>'+(hasVar?'<div class="note" style="margin-top:8px">Thu không cố định (freelance…) chỉ được đem ra chia khi bạn ghi khoản <b>Thu</b> thật, nên tháng ít job thì kế hoạch cũng tự co lại, không bị chia lố.</div>':'')+'</div>';
+ h+='</div></div>';
  var ed=UI.pedit,rows=[['__save',S.settings.saveName||'Tiết kiệm (cho mục tiêu)','#5E6AD2',tsv]].concat(FCATS.filter(outCat).map(function(c){return[c[0],c[1],c[2],L.filter(function(t){return t.kind==='out'&&!fromFund(t)&&t.fcat===c[0]}).reduce(function(s,t){return s+(+t.amount||0)},0)]}));
  var tot=rows.reduce(function(s,r){return s+(+B[r[0]]||0)},0),left=base-tot;
- h+='<div class="fsec"><div class="sec-h">Phân chia thu nhập<span>'+(base?'trên '+money(base,1)+(fix?(hasVar?' = '+money(fix,1)+' cố định + '+money(vrec,1)+' freelance đã nhận':''):' (theo số thực nhận)'):'')+'</span><span class="sp"></span>'+'<button class="pill" data-a="pedit">'+(ed?'Xong':'Sửa hạng mục')+'</button>'+(base&&!ed?'<button class="pill" data-a="planhint">Điền gợi ý</button>':'')+'</div>';
+ h+='<div class="fsec"><div class="sec-h">Phân chia thu nhập<span>'+(base?'trên '+money(base,1)+(fix||hasVar?(hasVar?' = '+money(fix,1)+' cố định + '+money(base-fix,1)+' không cố định':''):' (theo số thực nhận)'):'')+'</span><span class="sp"></span>'+'<button class="pill" data-a="pedit">'+(ed?'Xong':'Sửa hạng mục')+'</button>'+(base&&!ed?'<button class="pill" data-a="planhint">Điền gợi ý</button>':'')+'</div>';
  if(!base)h+='<div class="note">Thêm nguồn thu ở trên để chia theo %.</div>';
  h+='<div class="ptb al"><div class="ptr ph"><span>Hạng mục</span><span class="r">%</span><span class="r">Dự tính</span><span class="r">Đã dùng</span><span class="r">Còn lại</span></div>';
  h+=rows.map(function(r){var b=+B[r[0]]||0,pc=base&&b?Math.round(b/base*1000)/10:'',rem=b-r[3],over=b&&rem<0;
@@ -1316,8 +1316,8 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-incr
  if(d.fcdel){var n=recs('finance').filter(function(t){return t.fcat===d.fcdel}).length;if(n&&!d.sure){d.sure=1;b.style.color='var(--danger)';toast(n+' giao dịch đang dùng mục này sẽ chuyển sang “Khác”. Bấm lần nữa để xoá');return}
   recs('finance').forEach(function(t){if(t.fcat===d.fcdel)t.fcat='khac'});S.settings.fcats=S.settings.fcats.filter(function(c){return c[0]!==d.fcdel});if(S.settings.budget)delete S.settings.budget[d.fcdel];syncFcats();changed();renderMain();return}
  if(d.incrcv){var x=S.settings.incomes.filter(function(y){return y.id===d.incrcv})[0];if(!x)return;var mo=finMonth(),dim=new Date(+mo.slice(0,4),+mo.slice(5,7),0).getDate(),td=ymd(new Date()),dt=x.day?mo+'-'+pad(Math.min(+x.day,dim)):(mo===td.slice(0,7)?td:mo+'-01');
-  var r={id:uid(),created:Date.now(),cat:finCat(),kind:'in',amount:x.var?'':(+x.amount||''),fcat:x.var?'freelance':'luong',name:x.name||'Thu nhập',inc:x.id,date:dt,checks:[],links:[]};recs('finance').push(r);changed();
-  if(x.var||!r.amount){openRec('finance',r.id);setTimeout(function(){var f=$('.pnl [data-rf=amount]');f&&f.focus()},60)}else{renderMain();toast('Đã ghi nhận '+money(r.amount)+' · sửa số thực nếu khác')}return}
+  var r={id:uid(),created:Date.now(),cat:finCat(),kind:'in',amount:+x.amount||'',fcat:x.var?'freelance':'luong',name:x.name||'Thu nhập',inc:x.id,date:dt,checks:[],links:[]};recs('finance').push(r);changed();
+  if(!r.amount){openRec('finance',r.id);setTimeout(function(){var f=$('.pnl [data-rf=amount]');f&&f.focus()},60)}else{renderMain();toast('Đã ghi nhận '+money(r.amount)+' · sửa số thực nếu khác')}return}
  if(d.incmo){var mo=finMonth();S.settings.incomes.forEach(function(x){if(x.id===d.incmo)x.month=x.month?'':mo});changed();renderMain();return}
  if(d.incvar){S.settings.incomes.forEach(function(x){if(x.id===d.incvar)x.var=!x.var});changed();renderMain();return}
  if(d.incdel){S.settings.incomes=S.settings.incomes.filter(function(x){return x.id!==d.incdel});changed();renderMain();return}
@@ -1337,8 +1337,9 @@ document.addEventListener('change',function(e){var t=e.target,d=t.dataset;if(!d)
  if(d.alamt!=null&&d.alamt!==''){var v=parseMoney(t.value);if(v)B[d.alamt]=v;else delete B[d.alamt];changed();renderMain();return}
  if(d.alpct){var p=parseFloat(String(t.value).replace(',','.'));if(p>0)B[d.alpct]=Math.round(inc()*p/100/1e3)*1e3;else delete B[d.alpct];changed();renderMain();return}
 },true);
-function planBase(){var mo=finMonth(),I=(S.settings.incomes||[]).filter(function(x){return!x.month||x.month===mo}),L=recs('finance').filter(function(t){return t.kind==='in'&&fdate(t).slice(0,7)===mo});var fix=I.filter(function(x){return!x.var}).reduce(function(s,x){return s+(+x.amount||0)},0);
- if(!fix)return L.reduce(function(s,t){return s+(+t.amount||0)},0);return fix+(I.some(function(x){return x.var})?L.filter(function(t){return t.fcat!=='luong'}).reduce(function(s,t){return s+(+t.amount||0)},0):0)}
+function planBase(){var mo=finMonth(),I=(S.settings.incomes||[]).filter(function(x){return!x.month||x.month===mo}),L=recs('finance').filter(function(t){return t.kind==='in'&&fdate(t).slice(0,7)===mo});
+ if(!I.length)return L.reduce(function(s,t){return s+(+t.amount||0)},0);
+ return I.reduce(function(s,x){var a=+x.amount||0;if(x.var){var r=L.filter(function(t){return t.inc===x.id}).reduce(function(q,t){return q+(+t.amount||0)},0);a=Math.max(a,r)}return s+a},0)}
 
 var SWATCH=['#EB5757','#F2994A','#F2BE00','#4CB782','#26B5CE','#2F80ED','#5E6AD2','#A35BD6','#E255A1','#8D6E63','#8A8F98','#1B1B1F','#F7A6A6','#F9C78E','#F5DE7A','#9ED9B5','#93D8E6','#9DBEF5','#B3B8F0','#D6B0EE','#F3A9CF','#C9B2A6','#C4C7CC','#4F5257'];
 function swatchPop(anchor,cb){closePop();var el=document.createElement('div'),sc=document.createElement('div');sc.className='popscrim';el.className='pop swp'+(innerWidth<=860?' sheet':'');
