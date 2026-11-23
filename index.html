@@ -455,6 +455,7 @@ button.pv:hover{background:var(--hover)}
 @media(max-width:860px){.row .rdue{order:4;width:auto}.row .rdue:empty{display:none}}
 .rproj{width:190px;flex:none;display:flex;min-width:0}.rproj .mini{max-width:100%;min-width:0}.rproj .el{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rcat{width:140px;flex:none;display:flex;min-width:0}.rcat .tag{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:860px){.row .rproj,.row .rcat{order:5;width:auto}.row .rproj:empty{display:none}}
+.cchip.ghost{opacity:.6}.cchip.ghost::after{content:'↻';margin-left:4px;font-size:10px;opacity:.7}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -657,12 +658,13 @@ function projGroups(list){var c=vcat(),P=pjAll().filter(function(p){return(!c||p
 function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
 function calendar(list){var now=new Date(),today=ymd(now);if(!UI.cal)UI.cal=today.slice(0,7);if(!UI.calSel)UI.calSel=today;
  var y=+UI.cal.slice(0,4),m=+UI.cal.slice(5,7)-1,first=new Date(y,m,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+ var gEnd=new Date(start);gEnd.setDate(gEnd.getDate()+42);list=list.concat(repGhosts(list,start,gEnd)).sort(function(x,y){return(x.tm||'99')<(y.tm||'99')?-1:1});
  var by={};list.forEach(function(t){(by[t.d]=by[t.d]||[]).push(t)});
  var h='<div class="calbar"><button class="ib" data-a="calnav" data-d="-1" title="Tháng trước">‹</button><b>Tháng '+(m+1)+', '+y+'</b><button class="ib" data-a="calnav" data-d="1" title="Tháng sau">›</button><button class="pill" data-a="caltoday">Hôm nay</button><span class="sp"></span><span class="note desk" style="margin:0">Kéo việc sang ngày khác để dời lịch · Nhấp đúp vào ngày để thêm việc</span></div>';
  h+='<div class="cal"><div class="cal-h">'+['T2','T3','T4','T5','T6','T7','CN'].map(function(d){return'<span>'+d+'</span>'}).join('')+'</div><div class="cal-g">';
  for(var i=0;i<42;i++){var d=new Date(start);d.setDate(start.getDate()+i);var k=ymd(d),items=by[k]||[];if(i===35&&d.getMonth()!==m)break;
   h+='<div class="cell'+(d.getMonth()!==m?' out':'')+(k===today?' today':'')+(k===UI.calSel?' sel':'')+'" data-day="'+k+'" data-dropday="'+k+'"><div class="dn"><span>'+d.getDate()+'</span><button class="ib cadd" data-a="newon" data-day="'+k+'" title="Thêm việc">'+IC.plus+'</button></div>';
-  h+='<div class="chips">'+items.slice(0,3).map(function(t){return'<div class="cchip'+(t.done?' done':'')+(t.over?' over':'')+'" style="--c:'+t.c+'" '+(t.task?'data-open="'+t.task.id+'" draggable="true"':'data-orec="'+t.ref+'"'+(t.drag?' draggable="true"':''))+' title="'+esc(t.title)+'">'+(t.tm?'<span class="tm">'+t.tm+'</span>':'')+esc(t.title)+'</div>'}).join('')+(items.length>3?'<div class="more">+'+(items.length-3)+' việc</div>':'')+'</div>';
+  h+='<div class="chips">'+items.slice(0,3).map(function(t){return'<div class="cchip'+(t.ghost?' ghost':'')+(t.done?' done':'')+(t.over?' over':'')+'" style="--c:'+t.c+'" '+(t.task?'data-open="'+t.task.id+'"'+(t.ghost?'':' draggable="true"'):'data-orec="'+t.ref+'"'+(t.drag?' draggable="true"':''))+' title="'+esc(t.title)+'">'+(t.tm?'<span class="tm">'+t.tm+'</span>':'')+esc(t.title)+'</div>'}).join('')+(items.length>3?'<div class="more">+'+(items.length-3)+' việc</div>':'')+'</div>';
   h+='<div class="dots">'+items.slice(0,4).map(function(t){return'<i style="background:'+t.c+'"></i>'}).join('')+'</div></div>'}
  h+='</div></div>';
  var sel=new Date(UI.calSel+'T00:00'),sl=by[UI.calSel]||[],n=dd(sel);
@@ -740,6 +742,8 @@ function popFor(kind,anchor,t,apply){if(kind==='pic')return picPop(anchor,t,appl
  pop(anchor,items,cur,function(v){if(v==='__days')return daysPop(anchor,cur,function(x){apply(kind,x)});apply(kind,v)})}
 function setProp(t,k,v){if(k==='status'&&v==='done'&&t.status!=='done'&&t.id){S.doneLog.push({t:Date.now(),c:t.cat});var lim=Date.now()-120*864e5;S.doneLog=S.doneLog.filter(function(x){return x.t>lim})}if(k==='cat'&&t.cat!==v&&t.id){var c=cat(v);c.seq=(c.seq||0)+1;t.num=c.seq}
  if(k==='status'&&v==='done'&&t.repeat!=='none'&&t.due&&t.id){t[k]=v;return advance(t)}t[k]=k==='remind'?+v:v}
+function nextRep(rep,d){var ds=repDays(rep);d=new Date(d);if(ds&&ds.length){var n=0;do{d.setDate(d.getDate()+1);n++}while(ds.indexOf(String(d.getDay()))<0&&n<8)}else if(rep==='daily')d.setDate(d.getDate()+1);else if(rep==='weekly')d.setDate(d.getDate()+7);else if(rep==='monthly')d.setMonth(d.getMonth()+1);else d.setFullYear(9999);return d}
+function repGhosts(list,a,b){var out=[];list.forEach(function(i){var t=i.task;if(!t||!t.due||t.repeat==='none'||!active(t))return;var d=new Date(t.due);for(var n=0;n<120;n++){d=nextRep(t.repeat,d);if(d>=b)break;if(d>=a)out.push({d:ymd(d),tm:i.tm,title:i.title,c:i.c,task:t,ghost:true})}});return out}
 function advance(t){var d=new Date(t.due),ds=repDays(t.repeat);if(ds&&ds.length){var n=0;do{d.setDate(d.getDate()+1);n++}while(ds.indexOf(String(d.getDay()))<0&&n<8)}else if(t.repeat==='daily')d.setDate(d.getDate()+1);else if(t.repeat==='weekly')d.setDate(d.getDate()+7);else d.setMonth(d.getMonth()+1);
  t.due=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());t.status='todo';t.checks.forEach(function(k){k.done=false});toast('Xong! Lần tới: '+dueText(t))}
 
@@ -1040,7 +1044,7 @@ function calItems(only,cid){var it=[],F=UI.calF||{};function on(k){return only?t
   recs('courses').forEach(function(r){if(!r.days||!r.days.length)return;for(var d=new Date(a);d<b;d.setDate(d.getDate()+1)){var k=ymd(d);if(r.start&&k<r.start||r.end&&k>r.end)continue;if(r.days.indexOf(String(d.getDay()))>=0)it.push({d:k,tm:r.tstart||'',title:r.name||'Môn học',c:'#4CB782',ref:'courses:'+r.id})}})}
  if(cid)it=it.filter(function(i){var p=i.ref&&i.ref.split(':');var r=p&&rec(p[0],p[1]);return r&&r.cat===cid});
  it.sort(function(x,y){return(x.tm||'99')<(y.tm||'99')?-1:1});return it}
-function agendaRow(i){if(i.task)return row(i.task);return'<div class="row" data-orec="'+i.ref+'"><span class="stb"><span class="dot" style="background:'+i.c+'"></span></span><span class="rt"'+(i.done?' style="color:var(--mute);text-decoration:line-through"':'')+'>'+esc(i.title)+'</span><span class="rmeta">'+(i.tm?'<span class="mini">'+i.tm+'</span>':'')+'<span class="mini">'+esc(MODS[i.ref.split(':')[0]].name)+'</span></span></div>'}
+function agendaRow(i){if(i.ghost)return'<div class="row" data-open="'+i.task.id+'"><span class="stb">'+IC.rep+'</span><span class="rdue">'+(i.tm?'<span class="tag">'+IC.cal+i.tm+'</span>':'')+'</span><span class="rt">'+esc(i.title)+'</span><span class="rmeta"><span class="mini">Lặp lại · '+esc(repLbl(i.task.repeat))+'</span></span></div>';if(i.task)return row(i.task);return'<div class="row" data-orec="'+i.ref+'"><span class="stb"><span class="dot" style="background:'+i.c+'"></span></span><span class="rt"'+(i.done?' style="color:var(--mute);text-decoration:line-through"':'')+'>'+esc(i.title)+'</span><span class="rmeta">'+(i.tm?'<span class="mini">'+i.tm+'</span>':'')+'<span class="mini">'+esc(MODS[i.ref.split(':')[0]].name)+'</span></span></div>'}
 
 /* ---------- overview ---------- */
 function isoWeek(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));var day=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-day);var y0=new Date(Date.UTC(d.getUTCFullYear(),0,1));return d.getUTCFullYear()+'-W'+pad(Math.ceil(((d-y0)/864e5+1)/7))}
