@@ -451,6 +451,8 @@ button.pv:hover{background:var(--hover)}
 @media(max-width:860px){.vis,.fin-w{padding:12px 12px 90px}.vgrid{columns:2 150px;column-gap:10px}.vcard,.vadd{margin-bottom:10px}.fbar{grid-template-columns:100px 1fr 90px}.fbar:has(.fbi){grid-template-columns:100px 1fr 100px}.fbar:has(.fbi) .fv{display:none}.fq .inp,.fq #fq-amt,.fq select.inp{max-width:none;min-width:45%}}
 [data-pdrag]{cursor:grab}[data-pdrag]:hover .grip{opacity:1}
 .dpop{padding:12px;min-width:260px}.dpop .pnh{font-size:12px;color:var(--mute);margin:0 2px 8px}.dpop .dchips{margin-bottom:10px}.dpop .dchips button{padding:7px 10px}.dpop .dchips button.on{background:var(--accent);color:#fff}.dpop .primary{width:100%;justify-content:center}
+.rdue{width:132px;flex:none;display:flex}.rdue .tag{max-width:100%}
+@media(max-width:860px){.row .rdue{order:4;width:auto}.row .rdue:empty{display:none}}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -664,15 +666,16 @@ function calendar(list){var now=new Date(),today=ymd(now);if(!UI.cal)UI.cal=toda
  var sel=new Date(UI.calSel+'T00:00'),sl=by[UI.calSel]||[],n=dd(sel);
  h+='<div class="agenda"><div class="grp" style="position:static">'+IC.cal+'<span>'+(n===0?'Hôm nay':n===1?'Ngày mai':n===-1?'Hôm qua':DOW[sel.getDay()])+', '+pad(sel.getDate())+'/'+pad(sel.getMonth()+1)+'</span><span class="c">'+sl.length+'</span><button class="ib add" data-a="newon" data-day="'+UI.calSel+'" title="Thêm việc">'+IC.plus+'</button></div>'+(sl.length?sl.map(agendaRow).join(''):'<div class="note" style="padding:14px 22px">Không có việc nào trong ngày này.</div>')+'</div>';
  return h}
-function metaTags(t){var c=cat(t.cat),o=isOver(t),td=t.due&&dd(t.due)===0,h='';
+function dueTag(t){var o=isOver(t),td=t.due&&dd(t.due)===0;return t.due?'<span class="tag'+(o?' over':td&&active(t)?' today':'')+'">'+IC.cal+dueText(t)+'</span>':''}
+function metaTags(t,noDue){var c=cat(t.cat),o=isOver(t),td=t.due&&dd(t.due)===0,h='';
  if(t.checks.length){var d=t.checks.filter(function(x){return x.done}).length;h+='<span class="mini">'+IC.check+d+'/'+t.checks.length+'</span>'}
  if(t.links.length)h+='<span class="mini">'+IC.link+t.links.length+'</span>';
  if(t.repeat!=='none')h+='<span class="mini">'+IC.rep+'</span>';
  if(t.pic)h+='<span class="mini picm" title="PIC: '+esc(t.pic)+'">'+picAv(t.pic)+esc(t.pic)+'</span>';
- if(t.due)h+='<span class="tag'+(o?' over':td&&active(t)?' today':'')+'">'+IC.cal+dueText(t)+'</span>';
+ if(t.due&&!noDue)h+=dueTag(t);
  if(t.proj&&pjGet(t.proj)&&!(UI.layout!=='cal'&&grpMode()==='proj'))h+='<span class="mini">'+IC[pmod(pjGet(t.proj))==='courses'?'book':'proj']+esc(pjGet(t.proj).name)+'</span>';
  if(!vcat())h+='<span class="tag" style="--c:'+c.color+'"><i></i>'+esc(c.name)+'</span>';return h}
-function row(t){return'<div class="row '+t.status+(UI.open===t.id?' sel':'')+'" data-open="'+t.id+'" draggable="true"><button class="pri stb" data-pop="prio" data-id="'+t.id+'" title="'+lbl(PRIOS,t.prio)+'">'+prIcon(t.prio)+'</button><span class="tid">'+tid(t)+'</span><button class="stb" data-pop="status" data-id="'+t.id+'" title="'+lbl(STATUSES,t.status)+'">'+stIcon(t.status)+'</button><span class="rt">'+esc(t.title)+'</span><span class="rmeta">'+metaTags(t)+'</span></div>'}
+function row(t){return'<div class="row '+t.status+(UI.open===t.id?' sel':'')+'" data-open="'+t.id+'" draggable="true"><button class="pri stb" data-pop="prio" data-id="'+t.id+'" title="'+lbl(PRIOS,t.prio)+'">'+prIcon(t.prio)+'</button><span class="tid">'+tid(t)+'</span><button class="stb" data-pop="status" data-id="'+t.id+'" title="'+lbl(STATUSES,t.status)+'">'+stIcon(t.status)+'</button><span class="rdue">'+dueTag(t)+'</span><span class="rt">'+esc(t.title)+'</span><span class="rmeta">'+metaTags(t,1)+'</span></div>'}
 function bcard(t){return'<div class="bcard '+t.status+'" data-open="'+t.id+'" draggable="true"><div class="h">'+tid(t)+'<button class="stb" data-pop="status" data-id="'+t.id+'">'+stIcon(t.status)+'</button></div><div class="t">'+esc(t.title)+'</div><div class="f"><button class="stb" data-pop="prio" data-id="'+t.id+'">'+prIcon(t.prio)+'</button>'+metaTags(t)+'</div></div>'}
 
 /* ---------- panel ---------- */
