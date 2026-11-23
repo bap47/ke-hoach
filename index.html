@@ -417,6 +417,9 @@ button.pv:hover{background:var(--hover)}
 .ws .av{width:24px;height:24px;border-radius:7px}
 
 .guests{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.guests .gl{width:100%;font-size:12.5px;color:var(--mute);font-weight:500}.gchip{display:inline-flex;align-items:center;gap:4px;padding:3px 4px 3px 10px;border-radius:999px;background:var(--chip);font-size:13px}.gchip button{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:var(--faint)}.gchip button svg{width:10px;height:10px}.guests .addin{flex:1;min-width:180px}
+
+.pav{width:16px;height:16px;border-radius:50%;color:#fff;font-size:9.5px;font-weight:700;display:inline-grid;place-items:center;flex:none}.pill .pav{width:15px;height:15px}.picm{color:var(--ink2)}
+.pop.picnew{padding:10px;width:260px;display:grid;gap:8px}.pop.picnew .pnh{font-size:12.5px;color:var(--mute);font-weight:500}.pop.picnew .primary{justify-content:center}.pop.picnew.sheet{width:auto}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -445,7 +448,7 @@ function host(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){re
 function fixUrl(u){u=(u||'').trim();if(!u)return'';return/^[a-z]+:\/\//i.test(u)?u:'https://'+u}
 
 /* ---------- migrate ---------- */
-function migrate(){S.settings=S.settings||{};S.settings.title=S.settings.title||'Kế hoạch của Bắp';S.settings.accent=S.settings.accent||'#5E6AD2';S.cats=S.cats||[];S.tasks=S.tasks||[];S.recs=S.recs||{};S.doneLog=S.doneLog||[];S.reviews=S.reviews||{};if(!S.settings.pages)S.settings.pages=['SNDQ','MK Two Hotel','TrueFit Uniform'];if(!S.settings.theme)S.settings.theme='auto';
+function migrate(){S.settings=S.settings||{};S.settings.title=S.settings.title||'Kế hoạch của Bắp';S.settings.accent=S.settings.accent||'#5E6AD2';S.cats=S.cats||[];S.tasks=S.tasks||[];S.recs=S.recs||{};S.people=S.people||[];S.doneLog=S.doneLog||[];S.reviews=S.reviews||{};if(!S.settings.pages)S.settings.pages=['SNDQ','MK Two Hotel','TrueFit Uniform'];if(!S.settings.theme)S.settings.theme='auto';
  S.cats.forEach(function(c){if(!c.key)c.key=mkKey(c.name);if(!c.seq)c.seq=0});
  S.tasks.forEach(function(t){if(!t.links)t.links=[];if(!t.checks)t.checks=[];if(!t.prio)t.prio='none';if(!t.repeat)t.repeat='none';if(!t.remind)t.remind=30;if(t.note==null)t.note='';
   if(!t.num){var c=cat(t.cat);c.seq=(c.seq||0)+1;t.num=c.seq}});
@@ -625,6 +628,7 @@ function metaTags(t){var c=cat(t.cat),o=isOver(t),td=t.due&&dd(t.due)===0,h='';
  if(t.checks.length){var d=t.checks.filter(function(x){return x.done}).length;h+='<span class="mini">'+IC.check+d+'/'+t.checks.length+'</span>'}
  if(t.links.length)h+='<span class="mini">'+IC.link+t.links.length+'</span>';
  if(t.repeat!=='none')h+='<span class="mini">'+IC.rep+'</span>';
+ if(t.pic)h+='<span class="mini picm" title="PIC: '+esc(t.pic)+'">'+picAv(t.pic)+esc(t.pic)+'</span>';
  if(t.due)h+='<span class="tag'+(o?' over':td&&active(t)?' today':'')+'">'+IC.cal+dueText(t)+'</span>';
  if(t.proj&&rec('projects',t.proj)&&!(UI.layout!=='cal'&&grpMode()==='proj'))h+='<span class="mini">'+IC.proj+esc(rec('projects',t.proj).name)+'</span>';
  if(!vcat())h+='<span class="tag" style="--c:'+c.color+'"><i></i>'+esc(c.name)+'</span>';return h}
@@ -636,6 +640,7 @@ function propPills(t,ctx){var c=cat(t.cat);
  return'<button class="pill" data-pop="status" data-ctx="'+ctx+'">'+stIcon(t.status)+lbl(STATUSES,t.status)+'</button>'+
  '<button class="pill" data-pop="prio" data-ctx="'+ctx+'">'+prIcon(t.prio)+lbl(PRIOS,t.prio)+'</button>'+
  '<button class="pill" data-pop="cat" data-ctx="'+ctx+'">'+pq(c)+esc(c.name)+'</button>'+
+ '<button class="pill" data-pop="pic" data-ctx="'+ctx+'">'+(t.pic?picAv(t.pic)+esc(t.pic):IC.users+'PIC')+'</button>'+
  '<button class="pill" data-pop="due" data-ctx="'+ctx+'"'+(isOver(t)?' style="color:var(--danger)"':'')+'>'+IC.cal+(t.due?dueText(t):'Deadline')+'</button>'+
  (t.proj!==undefined||recs('projects').length?'<button class="pill" data-pop="proj" data-ctx="'+ctx+'">'+IC.proj+(t.proj&&rec('projects',t.proj)?esc(rec('projects',t.proj).name||'Dự án'):'Dự án')+'</button>':'')+
  (t.due?'<button class="pill" data-pop="remind" data-ctx="'+ctx+'">'+IC.bell+'Nhắc '+lbl(REMS,+t.remind)+'</button><button class="pill" data-pop="repeat" data-ctx="'+ctx+'">'+IC.rep+lbl(REPS,t.repeat)+'</button>':'')}
@@ -672,7 +677,13 @@ function pop(anchor,items,cur,cb){closePop();var el=document.createElement('div'
  if(innerWidth>860){var r=anchor.getBoundingClientRect(),w=el.offsetWidth,hh=el.offsetHeight;el.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';el.style.top=(r.bottom+hh+8>innerHeight?Math.max(8,r.top-hh-4):r.bottom+4)+'px'}
  sc.onclick=closePop;el.onclick=function(e){var b=e.target.closest('[data-pi]');if(b){var f=popCb;closePop();f(+b.dataset.pi)}}}
 function closePop(){$$('.pop,.popscrim').forEach(function(x){x.remove()});popCb=null}
-function popFor(kind,anchor,t,apply){if(kind==='due')return datePop2(anchor,t.due||'',true,function(v){apply('due',v)});if(kind==='proj')return pop(anchor,[['','Không thuộc dự án','']].concat(recs('projects').map(function(p){return[p.id,p.name||'Chưa đặt tên',pq(cat(p.cat))]})),t.proj||'',function(v){apply('proj',v)});var items,cur=t[kind==='cat'?'cat':kind];
+function picAv(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))%360;return'<span class="pav" style="background:hsl('+h+' 55% 52%)">'+esc((n.trim()[0]||'?').toUpperCase())+'</span>'}
+function picPop(anchor,t,apply){S.people=S.people||[];var items=[['','Chưa giao',IC.users],['Tôi','Tôi',picAv('Tôi')]].concat(S.people.filter(function(p){return p!=='Tôi'}).map(function(p){return[p,p,picAv(p)]})).concat([['__new','+ Thêm người…','']]);
+ pop(anchor,items,t.pic||'',function(v){if(v!=='__new')return apply('pic',v);closePop();var el=document.createElement('div'),sc=document.createElement('div');sc.className='popscrim';el.className='pop picnew'+(innerWidth<=860?' sheet':'');el.innerHTML='<div class="pnh">Tên người phụ trách</div><input class="inp" id="picin" placeholder="vd: Celine, anh Tuấn…"><button class="primary" id="picok">Thêm</button>';document.body.appendChild(sc);document.body.appendChild(el);
+  if(innerWidth>860){var r=anchor.getBoundingClientRect();el.style.left=Math.max(8,Math.min(r.left,innerWidth-el.offsetWidth-8))+'px';el.style.top=(r.bottom+4)+'px'}
+  var inp=$('#picin');inp.focus();function ok(){var n=inp.value.trim();if(!n)return;if(S.people.indexOf(n)<0)S.people.push(n);closePop();apply('pic',n)}
+  $('#picok').onclick=ok;inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();e.stopPropagation();ok()}else if(e.key==='Escape'){e.stopPropagation();closePop()}};sc.onclick=closePop})}
+function popFor(kind,anchor,t,apply){if(kind==='pic')return picPop(anchor,t,apply);if(kind==='due')return datePop2(anchor,t.due||'',true,function(v){apply('due',v)});if(kind==='proj')return pop(anchor,[['','Không thuộc dự án','']].concat(recs('projects').map(function(p){return[p.id,p.name||'Chưa đặt tên',pq(cat(p.cat))]})),t.proj||'',function(v){apply('proj',v)});var items,cur=t[kind==='cat'?'cat':kind];
  if(kind==='status')items=STATUSES.map(function(s){return[s[0],s[1],stIcon(s[0])]});
  else if(kind==='prio')items=PRIOS.map(function(p){return[p[0],p[1],prIcon(p[0])]});
  else if(kind==='cat')items=S.cats.map(function(c){return[c.id,c.name,pq(c)]});
