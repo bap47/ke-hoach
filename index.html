@@ -515,6 +515,7 @@ var STORE=(function(){var sb=null,user=null,timer=null,base=0,saving=false,dirty
   h+='<form id="authf" autocomplete="on"><label>Tên đăng nhập<input id="au" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="vd: bap123"></label><label>Mật khẩu<input id="ap" type="password" name="password" autocomplete="'+(reg?'new-password':'current-password')+'" placeholder="Ít nhất 6 ký tự"></label>'+(reg?'<label>Nhập lại mật khẩu<input id="ap2" type="password" autocomplete="new-password"></label>':'')+'<div class="autherr">'+(msg?esc(msg):'')+'</div><button class="primary authbtn" type="submit">'+(reg?'Tạo tài khoản':'Đăng nhập')+'</button></form>'+(reg?'<p class="note">Tên đăng nhập: 3–20 ký tự, chỉ gồm chữ không dấu, số, dấu chấm hoặc gạch dưới.</p>':'')+'</div></div>';
   var w=$('#authwrap');if(!w){w=document.createElement('div');w.id='authwrap';document.body.appendChild(w)}w.innerHTML=h;w.dataset.mode=mode;var f=$('#au');f&&f.focus()}
  function setErr(m){var e=$('.autherr');if(e)e.textContent=m;var b=$('.authbtn');if(b){b.disabled=false;b.style.opacity=1}}
+ document.addEventListener('change',function(e){if(e.target.id!=='impfile')return;var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(!d||!Array.isArray(d.tasks)||!Array.isArray(d.cats))throw 0;d.updatedAt=Date.now();$('#modal').innerHTML='';apply(d);dirty=true;save();toast('Đã nhập dữ liệu: '+d.tasks.length+' việc, '+d.cats.length+' mảng')}catch(x){toast('File không đúng định dạng dữ liệu của bảng')}};r.readAsText(f)},true);
  document.addEventListener('click',function(e){var b=e.target.closest('[data-auth]');if(b){e.stopPropagation();loginView(b.dataset.auth)}},true);
  document.addEventListener('submit',function(e){if(e.target.id!=='authf')return;e.preventDefault();var mode=$('#authwrap').dataset.mode,u=$('#au').value.trim(),p=$('#ap').value;
   if(!/^[a-zA-Z0-9._]{3,20}$/.test(u))return setErr('Tên đăng nhập 3–20 ký tự, chỉ gồm chữ không dấu, số, dấu chấm hoặc gạch dưới.');
@@ -536,9 +537,9 @@ var STORE=(function(){var sb=null,user=null,timer=null,base=0,saving=false,dirty
    sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
    sb.auth.getSession().then(function(r){if(r.data&&r.data.session)onSession(r.data.session);else loginView('login')});
    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&user&&!dirty)load()})},
-  settingsHTML:function(){return'<div class="box"><p>Tài khoản</p><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span>Đang đăng nhập: <b>'+esc(uname())+'</b></span><span class="sp"></span><button class="pill" data-a="export">Xuất dữ liệu (JSON)</button><button class="pill danger" data-a="logout">Đăng xuất</button></div></div>'},
+  settingsHTML:function(){return'<div class="box"><p>Tài khoản</p><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span>Đang đăng nhập: <b>'+esc(uname())+'</b></span><span class="sp"></span><label class="pill">Nhập dữ liệu<input type="file" accept=".json,application/json" id="impfile" hidden></label><button class="pill" data-a="export">Xuất dữ liệu (JSON)</button><button class="pill danger" data-a="logout">Đăng xuất</button></div></div>'},
   action:function(a){if(a==='logout'){sb.auth.signOut().then(function(){try{localStorage.removeItem('bap-kanban');sessionStorage.removeItem('bap-ui')}catch(x){}location.reload()});return true}
-   if(a==='export'){copy(JSON.stringify(S),'Đã copy dữ liệu');return true}return false}}})();
+   if(a==='export'){var dl=document.createElement('a');dl.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));dl.download='ke-hoach-'+uname()+'.json';document.body.appendChild(dl);dl.click();dl.remove();toast('Đã tải file dữ liệu');return true}return false}}})();
 
 
 /* ---------- views ---------- */
