@@ -1192,7 +1192,7 @@ MODS.goals={name:'Mục tiêu',one:'mục tiêu',ic:'star',group:'area',layouts:
 MODS.finance={name:'Tài chính',one:'giao dịch',ic:'wallet',layouts:['list'],fields:[
  {k:'name',t:'title',ph:'Nội dung (vd: Cà phê với khách)'},{k:'cat',l:'Mảng',t:'cat'},
  {k:'kind',l:'Loại',t:'sel',o:[['out','Chi','#EB5757'],['in','Thu','#4CB782'],['save','Tiết kiệm','#5E6AD2']]},
- {k:'amount',l:'Số tiền',t:'money'},{k:'fcat',l:'Danh mục',t:'sel',o:FCATS},{k:'date',l:'Ngày',t:'date'},{k:'goal',l:'Cho mục tiêu',t:'ref',ref:'goals'},{k:'fund',l:'Trả bằng',t:'sel',o:[['','Tiền tháng này','#8A8F98'],['1','Quỹ của mục tiêu','#5E6AD2']]},{k:'src',l:'Lấy từ tiền',t:'srcmo'},
+ {k:'amount',l:'Số tiền',t:'money'},{k:'fcat',l:'Danh mục',t:'sel',o:FCATS},{k:'date',l:'Ngày',t:'date'},{k:'goal',l:'Cho mục tiêu',t:'ref',ref:'goals'},{k:'fund',l:'Trả bằng',t:'sel',o:[['','Tự động','#A0A3A9'],['0','Tiền tháng này','#8A8F98'],['1','Quỹ của mục tiêu','#5E6AD2']]},{k:'src',l:'Lấy từ tiền',t:'srcmo'},
  {k:'note',l:'Ghi chú',t:'text',ph:'—'}],chips:['fcat','date']};
 function vfTabs(cur){return'<div class="tabs2">'+[['vision','Vision board',IC.star],['money','Tài chính',IC.wallet]].map(function(x){return'<button class="'+(cur===x[0]?'on':'')+'" data-view="'+x[0]+'">'+x[2]+'<span>'+x[1]+'</span></button>'}).join('')+'</div>'}
 function finCat(){var c=S.cats.filter(function(x){return x.id==='canhan'||/^ca nhan/.test(deacc(x.name||'').toLowerCase())})[0];return c?c.id:(S.cats[0]&&S.cats[0].id)}
@@ -1207,7 +1207,8 @@ function goalOf(t){if(t.goal)return t.goal==='none'?'':t.goal;if(t.kind!=='out')
  for(var i=0;i<G.length;i++){var g=G[i];if(t.fcat&&(g.fcat===t.fcat||(g.fcats||[]).indexOf(t.fcat)>=0))return g.id;if(n&&kwList(g).some(function(k){return n.indexOf(k)>=0}))return g.id}return''}
 function goalSpentL(g){return recs('finance').filter(function(t){return t.kind==='out'&&goalOf(t)===g.id})}
 function goalSpent(g){return goalSpentL(g).reduce(function(s,t){return s+(+t.amount||0)},0)}
-function fromFund(t){return t.kind==='out'&&t.fund==='1'&&goalOf(t)}
+function fromFund(t){if(t.kind!=='out')return false;var g=goalOf(t);if(!g)return false;if(t.fund==='1')return true;if(t.fund==='0')return false;return goalFlows(g)}
+function goalFlows(gid){var g=rec('goals',gid);if(!g)return false;var k=catOfGoal(g);return!!k&&(k==='__save'||+g.target>0)}
 function goalSaved(g){return recs('finance').filter(function(t){return t.goal===g.id&&t.kind==='save'}).reduce(function(s,t){return s+(+t.amount||0)},0)}
 function goalRefs(g){return(g.refs||[]).map(function(k){var p=k.split(':');var r=p[0]==='tasks'?task(p[1]):rec(p[0],p[1]);return r?{k:k,m:p[0],r:r}:null}).filter(Boolean)}
 function goalProg(g){var parts=[];goalRefs(g).forEach(function(x){if(x.m==='tasks')parts.push(x.r.status==='done'?100:0);else{var p=projProgress(x.r);parts.push(x.r.status==='done'?100:p.pct)}});
@@ -1216,7 +1217,7 @@ function goalProg(g){var parts=[];goalRefs(g).forEach(function(x){if(x.m==='task
 function shrinkImg(file,cb){if(!file||!/^image\//.test(file.type))return toast('Chọn một file ảnh nhé');var img=new Image(),url=URL.createObjectURL(file);
  img.onload=function(){var mx=720,s=Math.min(1,mx/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);cb(c.toDataURL('image/jpeg',.72))};
  img.onerror=function(){toast('Không đọc được ảnh này')};img.src=url}
-function visionView(){var G=recs('goals'),f=UI.va||'',L=f?G.filter(function(g){return g.area===f}):G;
+function visionView(){flowSync(ymd(new Date()).slice(0,7));var G=recs('goals'),f=UI.va||'',L=f?G.filter(function(g){return g.area===f}):G;
  var h=topBar(IC.star,'Vision board','<button class="primary" data-mnew="goals"'+(f?' data-g="'+f+'"':'')+'>'+IC.plus+'<span class="desk">Thêm mục tiêu</span></button>')+vfTabs('vision');
  var done=G.filter(function(g){return goalProg(g)>=100}).length;
  h+='<div class="vis"><div class="vhead"><div><h2>'+new Date().getFullYear()+' — năm của Bắp ✨</h2><p>'+(G.length?G.length+' mục tiêu · '+done+' đã đạt':'Dán ảnh, đặt mục tiêu, gắn với dự án và quỹ tiết kiệm để thấy mình đang tiến tới đâu.')+'</p></div></div>';
@@ -1239,7 +1240,7 @@ function srcMo(t){return t.src==='old'?'':(t.src||fdate(t).slice(0,7))}
 function srcText(t){return t.src==='old'?'Tiền có sẵn từ trước':t.src&&t.src!==fdate(t).slice(0,7)?'Thu nhập '+monthText(t.src).toLowerCase():'Thu nhập tháng gửi'}
 function fdate(t){return t.date||(t.created?ymd(new Date(t.created)):'')}
 function finMonth(){return UI.fm||ymd(new Date()).slice(0,7)}
-function financeView(cid){syncFcats();var mo=finMonth(),A=recs('finance').filter(function(t){return!cid||t.cat===cid}),L=A.filter(function(t){return fdate(t).slice(0,7)===mo});
+function financeView(cid){syncFcats();autoLink();if(flowSync(finMonth()))return financeView(cid);var mo=finMonth(),A=recs('finance').filter(function(t){return!cid||t.cat===cid}),L=A.filter(function(t){return fdate(t).slice(0,7)===mo});
  function sum(k){return L.filter(function(t){return t.kind===k&&!fromFund(t)}).reduce(function(s,t){return s+(+t.amount||0)},0)}
  var tin=sum('in'),tout=sum('out'),tsv=A.filter(function(t){return t.kind==='save'&&srcMo(t)===mo}).reduce(function(s,t){return s+(+t.amount||0)},0),fk=UI.fk||'out',B=budOf(finMonth());
  var fvw=UI.fv||'book';var vt='<div class="segs fvt"><button class="'+(fvw==='book'?'on':'')+'" data-fv="book">Sổ thu chi</button><button class="'+(fvw==='plan'?'on':'')+'" data-fv="plan">Kế hoạch phân chia</button></div>';
@@ -1351,7 +1352,7 @@ document.addEventListener('change',function(e){var t=e.target,d=t.dataset;if(!d)
  if(d.alamt!=null&&d.alamt!==''){var v=parseMoney(t.value);if(v)B[d.alamt]=v;else delete B[d.alamt];changed();renderMain();return}
  if(d.alpct){var p=parseFloat(String(t.value).replace(',','.'));if(p>0)B[d.alpct]=Math.round(inc()*p/100/1e3)*1e3;else delete B[d.alpct];changed();renderMain();return}
 },true);
-function planBase(){var mo=finMonth(),I=(S.settings.incomes||[]).filter(function(x){return!x.month||x.month===mo}),L=recs('finance').filter(function(t){return t.kind==='in'&&fdate(t).slice(0,7)===mo});
+function planBase(mo){mo=mo||finMonth();var I=(S.settings.incomes||[]).filter(function(x){return!x.month||x.month===mo}),L=recs('finance').filter(function(t){return t.kind==='in'&&fdate(t).slice(0,7)===mo});
  if(!I.length)return L.reduce(function(s,t){return s+(+t.amount||0)},0);
  return I.reduce(function(s,x){var a=+x.amount||0;if(x.var){var r=L.filter(function(t){return t.inc===x.id}).reduce(function(q,t){return q+(+t.amount||0)},0);a=Math.max(a,r)}return s+a},0)}
 
@@ -1401,6 +1402,15 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-mpic
 function budOf(mo){var S2=S.settings,M=S2.budgetM=S2.budgetM||{};if(S2.budget&&!S2.budgetMig){M[ymd(new Date()).slice(0,7)]=S2.budget;S2.budgetMig=1;delete S2.budget}return M[mo]=M[mo]||{}}
 function prevBud(mo){var M=S.settings.budgetM||{},ks=Object.keys(M).filter(function(k){return k<mo&&Object.keys(M[k]).length}).sort();return ks.length?ks[ks.length-1]:''}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-a=budcopy]');if(!b)return;e.stopPropagation();var mo=finMonth(),pm=prevBud(mo);if(!pm)return;var src=S.settings.budgetM[pm],dst=budOf(mo);for(var k in src)dst[k]=src[k];changed();renderMain();toast('Đã chép từ '+monthText(pm).toLowerCase()+' · sửa lại cho tháng này nhé')},true);
+
+function flowSync(mo){if(!S.settings.incomes&&!S.settings.budgetM)return;var B=(S.settings.budgetM||{})[mo]||{},base=planBase(mo),F=recs('finance');
+ var IN=F.filter(function(t){return t.kind==='in'&&fdate(t).slice(0,7)===mo}),got=IN.reduce(function(s,t){return s+(+t.amount||0)},0),ratio=base>0?Math.min(1,got/base):0;
+ var last=IN.map(fdate).sort().pop()||'',ch=false,want={};
+ Object.keys(B).forEach(function(k){var b=+B[k]||0,g=goalOfCat(k);if(!b||!g||!(k==='__save'||+g.target>0))return;var a=Math.round(b*ratio/1000)*1000;if(a>0)want[k]={a:a,g:g}});
+ F.filter(function(t){return t.auto&&t.flowMo===mo}).forEach(function(t){var w=want[t.auto];if(!w){S.recs.finance=recs('finance').filter(function(x){return x!==t});ch=true;return}
+  if(+t.amount!==w.a||t.goal!==w.g.id||t.date!==last){t.amount=w.a;t.goal=w.g.id;t.date=last;ch=true}delete want[t.auto]});
+ Object.keys(want).forEach(function(k){var w=want[k];recs('finance').push({id:uid(),created:Date.now(),cat:finCat(),kind:'save',amount:w.a,goal:w.g.id,fcat:'khac',auto:k,flowMo:mo,src:mo,date:last,name:'Tự chuyển vào quỹ: '+(w.g.name||catName(k)),checks:[],links:[]});ch=true});
+ if(ch)changed();return ch}
 
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){
