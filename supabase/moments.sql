@@ -14,6 +14,7 @@ create table if not exists public.moments (
 create index if not exists moments_created_idx on public.moments (created_at desc);
 
 alter table public.moments enable row level security;
+grant select, insert, delete on table public.moments to authenticated;
 
 -- Tên đăng nhập = phần trước @ của email (vd: bap123@users.kehoach.app -> bap123)
 drop policy if exists "moments_select" on public.moments;
