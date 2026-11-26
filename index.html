@@ -1275,7 +1275,7 @@ function ftype(k){for(var i=0;i<FCATS.length;i++)if(FCATS[i][0]===k)return FCATS
 function outCat(c){return(c[3]||'out')!=='in'}function inCat(c){return(c[3]||'out')!=='out'}
 MODS.goals={name:'Mục tiêu',one:'mục tiêu',ic:'star',group:'area',layouts:['list'],fields:[
  {k:'name',t:'title',ph:'Mục tiêu của bạn (vd: Mua MacBook mới)'},{k:'area',l:'Nhóm',t:'sel',o:AREAS},{k:'year',l:'Mốc thời gian',t:'mpick'},
- {k:'target',l:'Số tiền cần',t:'money'},{k:'base',l:'Đã có sẵn',t:'money'},{k:'fcats',l:'Hạng mục chi / phân chia',t:'fcmulti'},{k:'kw',l:'Từ khoá tự nhận chi',t:'str'},{k:'prog',l:'Tiến độ tự nhập (%)',t:'num',ph:'0–100'},
+ {k:'target',l:'Số tiền cần',t:'money'},{k:'base',l:'Đã có sẵn',t:'money'},{k:'fcats',l:'Hạng mục chi / phân chia',t:'fcmulti'},{k:'prog',l:'Tiến độ tự nhập (%)',t:'num',ph:'0–100'},
  {k:'note',l:'Vì sao mục tiêu này quan trọng',t:'text',ph:'Viết ra lý do, cảm giác khi đạt được…'},{k:'links',l:'Link cảm hứng',t:'links'}],chips:['area','year']};
 MODS.finance={name:'Tài chính',one:'giao dịch',ic:'wallet',layouts:['list'],fields:[
  {k:'name',t:'title',ph:'Nội dung (vd: Cà phê với khách)'},{k:'cat',l:'Mảng',t:'cat'},
