@@ -601,6 +601,10 @@ button.pv:hover{background:var(--hover)}
  .cell .cchip .tm{display:none}
  .cell .more{font-size:9px;padding:0;text-align:center;white-space:nowrap}
 }
+@media(max-width:860px){
+ .st4{min-width:0;padding:12px}.st4 b{font-size:clamp(17px,5.2vw,22px);overflow-wrap:anywhere}
+ .bcol.bempty{width:150px}
+}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -801,7 +805,7 @@ function renderMain(){if(modMain())return;var list=sorted(S.tasks.filter(functio
   h+='<div class="grp" data-drop="'+s+'">'+stIcon(s)+'<span>'+lbl(STATUSES,s)+'</span><span class="c">'+g.length+'</span><button class="ib add" data-a="newin" data-s="'+s+'" title="Thêm việc">'+IC.plus+'</button></div>';
   h+=g.map(row).join('')})}
  else{h+='<div class="board">'+['backlog','todo','doing','done'].concat(list.some(function(t){return t.status==='cancel'})?['cancel']:[]).map(function(s){var g=list.filter(function(t){return t.status===s});
-  return'<div class="bcol" data-drop="'+s+'"><h3>'+stIcon(s)+lbl(STATUSES,s)+'<span class="c">'+g.length+'</span><button class="ib" data-a="newin" data-s="'+s+'">'+IC.plus+'</button></h3>'+g.map(bcard).join('')+'</div>'}).join('')+'</div>'}
+  return'<div class="bcol'+(g.length?'':' bempty')+'" data-drop="'+s+'"><h3>'+stIcon(s)+lbl(STATUSES,s)+'<span class="c">'+g.length+'</span><button class="ib" data-a="newin" data-s="'+s+'">'+IC.plus+'</button></h3>'+g.map(bcard).join('')+'</div>'}).join('')+'</div>'}
  $('#main').innerHTML=h}
 function grpMode(){return UI.grp||(vcat()&&pjAll().some(function(p){return p.cat===vcat()})?'proj':'status')}
 function projGroups(list){var c=vcat(),P=pjAll().filter(function(p){return(!c||p.cat===c)&&(p.status!=='done'||list.some(function(t){return t.proj===p.id}))});
@@ -1128,7 +1132,7 @@ function linkRows(cid){var out=[];
 function docsView(cid){var D=recs('docs').filter(function(r){return r.cat===cid}),L=linkRows(cid),kf=fld('docs','kind'),h='';
  h+='<div class="grp" style="position:static"><span>Tài liệu đã lưu</span><span class="c">'+D.length+'</span><button class="ib add" data-mnew="docs" title="Thêm tài liệu">'+IC.plus+'</button></div>';
  h+=D.length?D.map(function(r){var o=opt(kf,r.kind),u=fixUrl(r.url||'');return'<div class="row" data-orec="docs:'+r.id+'"><span class="fv2">'+esc((host(u)||'?')[0].toUpperCase())+'</span><span class="rt">'+esc(r.name||'Chưa đặt tên')+'</span><span class="rmeta"><span class="tag" style="--c:'+o[2]+'"><i></i>'+o[1]+'</span>'+(u?'<span class="mini">'+esc(host(u))+'</span><a class="pill ghost" href="'+esc(u)+'" target="_blank" rel="noopener">'+IC.ext+'Mở</a>':'')+'</span></div>'}).join(''):'<div class="note" style="padding:10px 22px">Lưu các tài liệu dùng chung: brand guideline, bảng giá, template…</div>';
- h+='<div class="grp" style="position:static;margin-top:6px"><span>Link từ công việc</span><span class="c">'+L.length+'</span><span class="note" style="margin:0 0 0 8px">tự gom từ việc, dự án, bài đăng, đơn hàng</span></div>';
+ h+='<div class="grp" style="position:static;margin-top:6px"><span>Link từ công việc</span><span class="c">'+L.length+'</span><span class="note desk" style="margin:0 0 0 8px">tự gom từ việc, dự án, bài đăng, đơn hàng</span></div>';
  h+=L.length?L.map(function(x){var ho=host(x.u);return'<div class="row lrow2"><span class="fv2">'+esc((ho||'?')[0].toUpperCase())+'</span><a class="rt lnk2" href="'+esc(x.u)+'" target="_blank" rel="noopener">'+esc(ho)+'<small>'+esc(x.u.replace(/^https?:\/\/(www\.)?/,'').slice(ho.length,ho.length+50))+'</small></a><button class="src" '+x.open+'>'+x.ic+'<span>'+esc(x.src)+'</span></button></div>'}).join(''):'<div class="note" style="padding:10px 22px">Chưa có link nào. Gắn link trong một việc là nó tự hiện ở đây.</div>';
  return h}
 function emptyHint(m){return{projects:'Gom các việc liên quan thành một dự án để theo dõi tiến độ.',content:'Lên ý tưởng, viết caption và lên lịch đăng cho các fanpage.',partners:'Lưu khách hàng, nhà cung cấp, xưởng may và thông tin liên hệ.',orders:'Theo dõi từng đơn từ báo giá đến giao hàng.',courses:'Thêm môn học với ngày & giờ học — lịch học tự hiện trên Lịch tổng.',docs:'Gom brief, link Drive, Canva, Figma theo từng mảng.'}[m]||''}
