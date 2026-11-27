@@ -591,6 +591,16 @@ button.pv:hover{background:var(--hover)}
  .vadd{grid-column:1/-1;min-height:0!important;flex-direction:row!important;align-items:center;justify-content:center;gap:10px;padding:14px}.vadd .vplus{width:30px;height:30px}
  .orow{padding:11px 4px}.orow .stb{width:26px;height:26px;display:grid;place-items:center;margin:-6px 0 -6px -6px}
 }
+@media(max-width:860px){
+ .cal-g{grid-template-columns:repeat(7,minmax(0,1fr))}
+ .cell{min-height:64px;align-items:stretch;padding:3px 2px 4px}
+ .cell .dn{justify-content:center;height:22px}
+ .cell .chips{display:flex;flex-direction:column;gap:2px;margin-top:2px;min-width:0}
+ .cell .dots,.cell .cadd{display:none}
+ .cell .cchip{font-size:9.5px;line-height:1.2;padding:2px 2px 0 3px;border-bottom:2px solid transparent;border-radius:3px;border-left-width:2px;letter-spacing:-.01em;white-space:normal;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-height:calc(2.4em + 4px);flex:none;box-sizing:border-box}
+ .cell .cchip .tm{display:none}
+ .cell .more{font-size:9px;padding:0;text-align:center;white-space:nowrap}
+}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
