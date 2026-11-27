@@ -467,7 +467,7 @@ button.pv:hover{background:var(--hover)}
 .dpop{padding:12px;min-width:260px}.dpop .pnh{font-size:12px;color:var(--mute);margin:0 2px 8px}.dpop .dchips{margin-bottom:10px}.dpop .dchips button{padding:7px 10px}.dpop .dchips button.on{background:var(--accent);color:#fff}.dpop .primary{width:100%;justify-content:center}
 .rdue{width:132px;flex:none;display:flex}.rdue .tag{max-width:100%}
 @media(max-width:860px){.row .rdue{order:4;width:auto}.row .rdue:empty{display:none}}
-.rproj{width:190px;flex:none;display:flex;min-width:0}.rproj .mini{max-width:100%;min-width:0}.rproj .el{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rcat{width:132px;flex:none;display:flex;min-width:0}@media(max-width:860px){.row .rcat{order:1!important}}.rcat .tag{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rproj{width:190px;flex:none;display:flex;min-width:0}.rproj .mini{max-width:100%;min-width:0}.rproj .el{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rcat{width:156px;flex:none;display:flex;min-width:0}.rcat .tag{font-size:11.5px}@media(max-width:860px){.row .rcat{order:1!important}}.rcat .tag{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:860px){.row .rproj,.row .rcat{order:5;width:auto}.row .rproj:empty{display:none}}
 .cchip.ghost{opacity:.6}.cchip.ghost::after{content:'↻';margin-left:4px;font-size:10px;opacity:.7}
 .nospin::-webkit-inner-spin-button,.nospin::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.nospin{-moz-appearance:textfield}
@@ -578,6 +578,19 @@ button.pv:hover{background:var(--hover)}
 .mo-gw{width:100%;max-width:980px;margin:0 auto;padding:0 16px 40px;box-sizing:border-box}.mo-feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px 12px;margin-top:22px}.mo-feed>.empty,.mo-feed>.note{grid-column:1/-1}.mo-feed .mo-img{border-radius:20px;cursor:zoom-in}.mo-feed .mo-capv{bottom:8px;padding:4px 10px;font-size:12px}.mo-feed .mo-meta{margin-top:6px;font-size:12.5px;gap:5px}.mo-feed .mo-meta .ib{width:22px;height:22px}
 @media(max-width:600px){.mo-gw{padding:0 10px 30px}.mo-feed{grid-template-columns:repeat(3,1fr);gap:10px 6px}.mo-feed .mo-img{border-radius:14px}.mo-feed .mo-capv{font-size:10.5px;padding:3px 7px;bottom:5px}.mo-feed .mo-meta{font-size:11px;gap:3px}.mo-feed .mo-meta .av{display:none}}
 .mo-lb{position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;cursor:zoom-out}.mo-lb img{width:min(92vw,620px,80vh);height:auto;max-height:80vh;object-fit:contain;border-radius:28px;display:block}.mo-lb span{color:#fff;font-weight:600;font-size:15px;text-align:center}.mo-lb small{color:rgba(255,255,255,.65);font-size:13px}
+@media(max-width:860px){
+ .row{position:relative;padding:10px 14px 11px 48px;gap:4px 8px;align-items:center}
+ .row>.stb:not(.pri){position:absolute;left:10px;top:7px;width:30px;height:30px;display:grid;place-items:center;margin:0;order:0}
+ .row .rcat{order:1!important;flex-basis:100%;width:auto}.row .rcat .tag{border:0;background:none;padding:0;font-size:11.5px;font-weight:500;gap:5px}
+ .row .rt{order:2;flex-basis:100%;font-size:15px;line-height:1.35}
+ .row .rdue{order:3}.row>.pri.stb{order:4;margin:0}.row .rmeta{order:5}.row .rproj{order:6;width:auto}
+ .row .tid,.row>.pri.pnone{display:none}
+ .ov2>*{min-width:0}
+ .mf .props{flex-basis:100%}.mf>.primary{flex:1 1 100%;justify-content:center;padding:11px;font-size:15px;border-radius:10px}
+ .vgrid .vimg{aspect-ratio:2/1}.vtop{white-space:nowrap;overflow:hidden;font-size:11px}.vtop span:last-child{overflow:hidden;text-overflow:ellipsis}
+ .vadd{grid-column:1/-1;min-height:0!important;flex-direction:row!important;align-items:center;justify-content:center;gap:10px;padding:14px}.vadd .vplus{width:30px;height:30px}
+ .orow{padding:11px 4px}.orow .stb{width:26px;height:26px;display:grid;place-items:center;margin:-6px 0 -6px -6px}
+}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><div id="app"></div><script type="application/json" id="state">{"updatedAt": 0, "settings": {"title": "Kế hoạch", "accent": "#5E6AD2", "pages": [], "theme": "auto"}, "cats": [], "tasks": [], "recs": {}}</script><script id="app-js">(function(){
 var S=JSON.parse(document.getElementById('state').textContent);
 try{var L=JSON.parse(localStorage.getItem('bap-kanban')||'null');if(L&&L.updatedAt>S.updatedAt)S=L}catch(e){}
@@ -813,7 +826,7 @@ function metaTags(t,noDue){var c=cat(t.cat),o=isOver(t),td=t.due&&dd(t.due)===0,
  if(noDue)return h;
  if(t.proj&&pjGet(t.proj)&&!(UI.layout!=='cal'&&grpMode()==='proj'))h+='<span class="mini">'+IC[pmod(pjGet(t.proj))==='courses'?'book':'proj']+esc(pjGet(t.proj).name)+'</span>';
  if(!vcat())h+='<span class="tag" style="--c:'+c.color+'"><i></i>'+esc(c.name)+'</span>';return h}
-function row(t){return'<div class="row '+t.status+(UI.open===t.id?' sel':'')+'" data-open="'+t.id+'" draggable="true"><button class="pri stb" data-pop="prio" data-id="'+t.id+'" title="'+lbl(PRIOS,t.prio)+'">'+prIcon(t.prio)+'</button><span class="tid">'+tid(t)+'</span><button class="stb" data-pop="status" data-id="'+t.id+'" title="'+lbl(STATUSES,t.status)+'">'+stIcon(t.status)+'</button><span class="rdue">'+dueTag(t)+'</span>'+(!vcat()?'<span class="rcat">'+catTag(t)+'</span>':'')+'<span class="rt">'+esc(t.title)+'</span><span class="rmeta">'+metaTags(t,1)+'</span>'+(UI.layout==='cal'||grpMode()!=='proj'?'<span class="rproj">'+projTag(t)+'</span>':'')+'</div>'}
+function row(t){return'<div class="row '+t.status+(UI.open===t.id?' sel':'')+'" data-open="'+t.id+'" draggable="true"><button class="pri stb'+(!t.prio||t.prio==='none'?' pnone':'')+'" data-pop="prio" data-id="'+t.id+'" title="'+lbl(PRIOS,t.prio)+'">'+prIcon(t.prio)+'</button><span class="tid">'+tid(t)+'</span><button class="stb" data-pop="status" data-id="'+t.id+'" title="'+lbl(STATUSES,t.status)+'">'+stIcon(t.status)+'</button><span class="rdue">'+dueTag(t)+'</span>'+(!vcat()?'<span class="rcat">'+catTag(t)+'</span>':'')+'<span class="rt">'+esc(t.title)+'</span><span class="rmeta">'+metaTags(t,1)+'</span>'+(UI.layout==='cal'||grpMode()!=='proj'?'<span class="rproj">'+projTag(t)+'</span>':'')+'</div>'}
 function bcard(t){return'<div class="bcard '+t.status+'" data-open="'+t.id+'" draggable="true"><div class="h">'+tid(t)+'<button class="stb" data-pop="status" data-id="'+t.id+'">'+stIcon(t.status)+'</button></div><div class="t">'+esc(t.title)+'</div><div class="f"><button class="stb" data-pop="prio" data-id="'+t.id+'">'+prIcon(t.prio)+'</button>'+metaTags(t)+'</div></div>'}
 
 /* ---------- panel ---------- */
